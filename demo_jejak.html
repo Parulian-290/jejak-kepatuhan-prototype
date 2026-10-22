@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JEJAK Kepatuhan — Single Upload & Legal Audit Prototype (22 Oktober 2026)</title>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<style>
+:root{--paper:#FAFAF7;--panel:#fff;--ink:#1B2A41;--soft:#4A5568;--green:#1B7A4C;--deep:#0F4A2E;--line:#E1E5DE;--amber:#B8792B;--red:#B23B3B;--redbg:#FBECEC;--amberbg:#FBF3E7;--greenbg:#EBF4EF;--grey:#F1F3F0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Georgia,'Times New Roman',serif}
+.top{display:flex;justify-content:space-between;align-items:center;padding:18px 28px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap;gap:10px}
+.brand{display:flex;align-items:center;gap:12px}
+.mark{width:34px;height:34px;border-radius:7px;background:var(--deep);color:#fff;font-weight:bold;display:flex;align-items:center;justify-content:center}
+.brand b{font-size:21px}.brand small{display:block;font-family:Arial;font-size:11.5px;color:var(--soft);letter-spacing:.3px}
+.priv{font-family:Arial;font-size:12px;background:var(--greenbg);color:var(--deep);padding:8px 12px;border-radius:6px;max-width:520px}
+.tabs{display:flex;gap:4px;padding:14px 28px 0;font-family:Arial}
+.tab{padding:10px 18px;border:1px solid var(--line);border-bottom:none;border-radius:6px 6px 0 0;background:var(--grey);cursor:pointer;font-size:13.5px;color:var(--soft)}
+.tab.on{background:var(--panel);color:var(--deep);font-weight:bold}
+.wrap{padding:0 28px 40px}.card{background:var(--panel);border:1px solid var(--line);border-radius:0 6px 6px 6px;padding:22px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+label{display:block;font-family:Arial;font-size:11px;letter-spacing:.4px;font-weight:bold;color:var(--soft);margin:12px 0 5px}
+textarea,select,input[type="text"]{width:100%;font-family:Arial;font-size:12.5px;border:1px solid var(--line);border-radius:5px;padding:9px;background:var(--paper);color:var(--ink)}
+textarea{height:90px;resize:vertical}
+.row{display:flex;gap:10px;align-items:end}.row>div{flex:1}
+button{font-family:Arial;font-size:13.5px;font-weight:bold;border:none;border-radius:6px;padding:11px 18px;cursor:pointer;background:var(--green);color:#fff}
+button.sec{background:var(--grey);color:var(--ink);border:1px solid var(--line)}
+.res h3{margin:0 0 6px;font-size:18px}
+.badge{display:inline-block;padding:4px 11px;border-radius:20px;font-family:Arial;font-size:12px;font-weight:bold}
+.Tinggi{background:var(--redbg);color:var(--red)}.Sedang{background:var(--amberbg);color:var(--amber)}.TidakAdaIndikasi{background:var(--greenbg);color:var(--deep)}
+.box{border-left:3px solid var(--green);background:var(--greenbg);padding:11px 13px;border-radius:4px;margin:12px 0;font-family:Arial;font-size:12.5px;line-height:1.5}
+.box.warn{border-color:var(--red);background:var(--redbg)}
+.box.law{border-color:var(--ink);background:var(--grey);font-size:11.5px;color:var(--soft)}
+.kv{display:grid;grid-template-columns:160px 1fr;gap:5px 12px;font-family:Arial;font-size:12.5px;margin:10px 0}.kv div:nth-child(odd){color:var(--soft)}
+.ocr-label-wrap{display:flex;justify-content:space-between;align-items:center;margin:10px 0 4px}
+.ocr-label-wrap label{margin:0}
+.ocr-input{font-size:11px;font-family:Arial}
+.ocr-master-box{background:var(--greenbg);border:1px solid var(--green);padding:12px;border-radius:6px;margin:12px 0}
+</style></head><body>
+<div class="top"><div class="brand"><div class="mark">JK</div><div><b>JEJAK Kepatuhan</b><small>PURWARUPA LIVE DASHBOARD · 22 OKTOBER 2026</small></div></div>
+<div class="priv"><b>Privasi:</b> Seluruh pemrosesan (termasuk OCR) berjalan 100% di browser Anda. Tidak ada data yang dikirim ke server luar.</div></div>
+<div class="tabs"><div class="tab on">Analisis Dokumen Master (Single Upload)</div></div>
+<div class="wrap">
+<div class="card"><div class="grid">
+<div>
+<div class="row">
+  <div><label>NAMA PETUGAS / AUDITOR</label><input type="text" id="petugas" value="Johannes Sipahutar, S.H."></div>
+  <div><label>SKALA USAHA</label><select id="skala" onchange="analisis()"><option value="Korporasi">Korporasi</option><option value="UMKM">UMKM</option></select></div>
+</div>
+<div class="row" style="margin-top:10px;">
+  <div><label>SEGMENTASI PESERTA (PSTV08)</label>
+    <select id="pstv08">
+      <option value="PPU">PPU (Pekerja Penerima Upah)</option>
+      <option value="PBPU">PBPU (Mandiri)</option>
+      <option value="BP">BP (Bukan Pekerja)</option>
+      <option value="PBI APBN">PBI APBN</option>
+      <option value="PBI APBD">PBI APBD</option>
+    </select>
+  </div>
+</div>
+
+<div style="margin-top:10px"><label>PILIH DARI 50 KASUS SIMULASI UJI COBA</label><select id="pick" onchange="muat(this.value)"></select></div>
+
+<div class="ocr-master-box">
+  <div class="ocr-label-wrap" style="margin:0">
+    <div>
+      <b style="font-family:Arial;font-size:12px;color:var(--deep)">📸 SINGLE UPLOAD (SCAN MASTER COMPONENT)</b>
+      <div class="small">Mendukung format PNG, JPG, JPEG, WEBP, BMP, & TIFF.</div>
+    </div>
+    <input type="file" class="ocr-input" accept="image/*,.tiff,.tif" onchange="prosesOCRMaster(this, 'st-master')">
+  </div>
+  <span id="st-master" class="small" style="color:var(--amber);font-weight:bold;display:block;margin-top:4px"></span>
+</div>
+
+<div class="ocr-label-wrap"><label>1 · KONTRAK KERJA</label></div><textarea id="k"></textarea>
+<div class="ocr-label-wrap"><label>2 · SLIP GAJI</label></div><textarea id="s"></textarea>
+<div class="ocr-label-wrap"><label>3 · DATA KEPESERTAAN BPJS</label></div><textarea id="b"></textarea>
+
+<div style="margin-top:14px;display:flex;gap:10px">
+  <button onclick="analisis()">Analisis Kepatuhan</button>
+  <button class="sec" onclick="unduhSessionLog()">Unduh Session Log (JSON)</button>
+  <button class="sec" onclick="kosong()">Kosongkan</button>
+</div>
+</div>
+<div class="res" id="out"><p class="small">Pilih dari 50 kasus atau unggah berkas foto master, lalu klik <b>Analisis</b>.</p></div>
+</div></div></div>
+
+<script>
+let sessionAuditLog = [];
+const CASES_50 = [];
+
+// GENERATE 50 DATA FIKTIF SIMULASI SINGLE UPLOAD
+const BENTUK = ["PT", "CV", "UD", "Toko", "Bengkel", "Katering", "Apotek", "Retail", "Koperasi", "Klinik"];
+const NAMA = ["Mitra Sejahtera", "Cahaya Utama", "Boga Mandiri", "Karya Bersama", "Sumber Terbit", "Sentosa Abadi", "Graha Logistik", "Pratama Farma", "Rizky Jaya", "Bintang Selatan"];
+
+for (let i = 1; i <= 50; i++) {
+  const b = BENTUK[i % BENTUK.length];
+  const n = NAMA[i % NAMA.length];
+  const entitas = `${b} ${n} ${i}`;
+  const skala = (b === "PT") ? "Korporasi" : "UMKM";
+  
+  CASES_50.push({
+    id: `SIM-${String(i).padStart(3, '0')}`,
+    perusahaan: entitas,
+    skala_usaha: skala,
+    kontrak_kerja_text: `PERJANJIAN KERJA WAKTU TIDAK TERTENTU\nNo: ${i}/HRD/PKWTT/2026\nAntara ${entitas} dan Karyawan ${i}.\nStatus Kerja: TETAP sejak 10 Januari 2022.`,
+    slip_gaji_text: `SLIP GAJI - ${entitas}\nPeriode: September 2026\nTOTAL DITERIMA: Rp ${(5000000 + i*150000).toLocaleString("id-ID")}`,
+    data_bpjs_text: `DATA KEPESERTAAN TERDAFTAR - BPJS\nNama Pemberi Kerja: ${entitas}\nStatus Kerja Dilaporkan: ${i%2===0?"Tenaga Lepas":"TETAP"}\nUpah Dilaporkan: Rp ${(i%2===0 ? 3500000 : 5000000 + i*150000).toLocaleString("id-ID")}`
+  });
+}
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const rp = n => n==null?"-":"Rp "+Number(n).toLocaleString("id-ID");
+
+function init(){
+  let o = '<option value="">— pilih dari 50 kasus simulasi —</option>';
+  CASES_50.forEach((c,i) => o += `<option value="${i}">${esc(c.id)} · ${esc(c.perusahaan)} (${c.skala_usaha})</option>`);
+  $("pick").innerHTML = o;
+}
+
+function muat(i){
+  if(i==="") return;
+  const c = CASES_50[+i];
+  $("k").value = c.kontrak_kerja_text;
+  $("s").value = c.slip_gaji_text;
+  $("b").value = c.data_bpjs_text;
+  $("skala").value = c.skala_usaha;
+  analisis();
+}
+
+function kosong(){
+  ["k","s","b"].forEach(x => $(x).value="");
+  $("st-master").innerText = "";
+  $("out").innerHTML = '<p class="small">Pilih dari 50 kasus atau unggah berkas foto master, lalu klik <b>Analisis</b>.</p>';
+}
+
+async function prosesOCRMaster(input, statusId) {
+  const file = input.files[0]; if (!file) return;
+  $(statusId).innerText = "⏳ Membaca gambar master...";
+  try {
+    const res = await Tesseract.recognize(file, 'ind+eng');
+    pemisahTeksOtomatis(res.data.text.trim());
+    $(statusId).innerText = "✅ Pemindaian selesai!";
+    analisis();
+  } catch(e) { $(statusId).innerText = "❌ Gagal membaca gambar"; }
+}
+
+function pemisahTeksOtomatis(fullText) {
+  if (/\b(PT|PERSERO)\b/i.test(fullText)) $("skala").value = "Korporasi";
+  else if (/\b(CV|UD|TOKO|BENGKEL|KATERING|APOTEK)\b/i.test(fullText)) $("skala").value = "UMKM";
+  const lines = fullText.split('\n');
+  let k=[], s=[], b=[], curr='k';
+  for (let line of lines) {
+    const u = line.toUpperCase();
+    if (u.includes("BPJS") || u.includes("KEPESERTAAN")) curr='b';
+    else if (u.includes("SLIP") || u.includes("TOTAL DITERIMA")) curr='s';
+    else if (u.includes("PERJANJIAN") || u.includes("KONTRAK")) curr='k';
+    if(curr==='k') k.push(line); else if(curr==='s') s.push(line); else b.push(line);
+  }
+  $("k").value = k.join('\n'); $("s").value = s.join('\n'); $("b").value = b.join('\n');
+}
+
+function analisis(){
+  const sText = $("s").value, bText = $("b").value;
+  const mS = /[Diterima|Upah][^\d]*?Rp\s*([\d.]+)/i.exec(sText) || (sText.match(/([\d]{1,3}(?:\.\d{3}){1,3})/g) || []);
+  const mB = /Upah Dilaporkan[^\d]*?Rp\s*([\d.]+)/i.exec(bText);
+  
+  let upahSlip = typeof mS === "object" && mS[1] ? parseInt(mS[1].replace(/\./g,""),10) : 5000000;
+  let upahBpjs = mB ? parseInt(mB[1].replace(/\./g,""),10) : 3500000;
+  
+  let gap = Math.round((upahSlip - upahBpjs) / upahSlip * 100);
+  let flags = [], pasal = [];
+  if(gap > 15) {
+    flags.push(`Under-Reporting Upah (Selisih ${gap}%)`);
+    pasal.push("Pasal 15 UU No. 24/2011 (BPJS)");
+  }
+  if($("b").value.toUpperCase().includes("LEPAS") && $("k").value.toUpperCase().includes("TETAP")){
+    flags.push("Misklasifikasi Status Kerja");
+    pasal.push("Pasal 59 UU Cipta Kerja");
+  }
+
+  let skor = flags.length ? 90 : 0;
+  let label = flags.length ? "Tinggi" : "Tidak Ada Indikasi";
+
+  sessionAuditLog.push({
+    timestamp: new Date().toISOString(),
+    petugas: $("petugas").value,
+    pstv08: $("pstv08").value,
+    skala: $("skala").value,
+    upah_slip: upahSlip,
+    upah_bpjs: upahBpjs,
+    flags, skor, label
+  });
+
+  let h = `<h3>${$("pick").value !== "" ? CASES_50[+$("pick").value].perusahaan : "(Hasil Upload Master)"}</h3>
+  <span class="badge ${label.replace(/\s/g,"")}">${label} · ${skor}%</span> <span class="small">skala ${$("skala").value}</span>
+  <div class="kv">
+    <div>Petugas Auditor</div><div><b>${esc($("petugas").value)}</b></div>
+    <div>Segmentasi PSTV08</div><div><b>${esc($("pstv08").value)}</b></div>
+    <div>Upah di Slip Gaji</div><div>${rp(upahSlip)}</div>
+    <div>Upah dilaporkan BPJS</div><div>${rp(upahBpjs)}</div>
+    <div>Selisih Upah</div><div>${gap}%</div>
+  </div>`;
+  if(flags.length) h += `<div class="box warn"><b>Indikasi Pelanggaran:</b><br>${flags.join("<br>")}<br><br><b>Rujukan Hukum:</b><br>${pasal.join("<br>")}</div>`;
+  $("out").innerHTML = h;
+}
+
+function unduhSessionLog() {
+  const blob = new Blob([JSON.stringify(sessionAuditLog, null, 2)], {type: "application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `AuditLog_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+
+init();
+</script></body></html>

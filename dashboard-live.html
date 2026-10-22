@@ -2,7 +2,9 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>JEJAK Kepatuhan — Dashboard Auditor (Purwarupa, data live dari engine.py)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JEJAK Kepatuhan — Dashboard Prioritas Kasus (22 Oktober 2026)</title>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
   :root{
     --paper:#FAFAF7; --panel:#FFFFFF; --ink:#1B2A41; --ink-soft:#4A5568;
@@ -10,64 +12,58 @@
     --red:#B23B3B; --red-bg:#FBECEC; --amber-bg:#FBF3E7; --green-bg:#EBF4EF; --grey-bg:#F1F3F0;
   }
   *{box-sizing:border-box;}
-  body{ margin:0; background:var(--paper); color:var(--ink); font-family:Georgia,'Times New Roman',serif; width:1440px; }
+  body{ margin:0; background:var(--paper); color:var(--ink); font-family:Georgia,'Times New Roman',serif; width:100%; }
   .data-sans{ font-family: Arial, Helvetica, sans-serif; }
-  .topbar{ display:flex; align-items:center; justify-content:space-between; padding:22px 32px; border-bottom:1px solid var(--line); background:var(--panel); }
-  .brand{ display:flex; align-items:baseline; gap:10px; }
-  .brand .mark{ width:34px; height:34px; border-radius:7px; background:var(--green-deep); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:16px; font-family:Georgia,serif; }
-  .brand .name{ font-size:21px; font-weight:bold; color:var(--ink); }
-  .brand .tag{ font-family:Arial,sans-serif; font-size:12px; color:var(--ink-soft); letter-spacing:.3px; }
-  .topbar-right{ display:flex; align-items:center; gap:22px; font-family:Arial,sans-serif; }
+  .topbar{ display:flex; align-items:center; justify-content:space-between; padding:18px 32px; border-bottom:1px solid var(--line); background:var(--panel); }
+  .brand{ display:flex; align-items:center; gap:12px; }
+  .brand .mark{ width:36px; height:36px; border-radius:7px; background:var(--green-deep); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:16px; }
+  .brand .name{ font-size:20px; font-weight:bold; color:var(--ink); }
+  .brand .tag{ font-family:Arial,sans-serif; font-size:11.5px; color:var(--ink-soft); }
+  .topbar-right{ display:flex; align-items:center; gap:16px; font-family:Arial,sans-serif; }
   .auditor{ text-align:right; }
   .auditor .who{ font-size:13px; font-weight:bold; color:var(--ink); }
-  .auditor .where{ font-size:11.5px; color:var(--ink-soft); }
+  .auditor .role{ font-size:11px; color:var(--green); font-weight:bold; }
   .avatar{ width:36px; height:36px; border-radius:50%; background:var(--green); color:#fff; display:flex; align-items:center; justify-content:center; font-family:Georgia,serif; font-weight:bold; font-size:14px; }
   .app{ display:flex; }
-  .sidebar{ width:220px; border-right:1px solid var(--line); background:var(--panel); padding:26px 0; }
-  .side-item{ font-family:Arial,sans-serif; font-size:13.5px; color:var(--ink-soft); padding:12px 28px; border-left:3px solid transparent; }
+  .sidebar{ width:230px; border-right:1px solid var(--line); background:var(--panel); padding:24px 0; min-height:calc(100vh - 75px); }
+  .side-item{ font-family:Arial,sans-serif; font-size:13px; color:var(--ink-soft); padding:12px 24px; border-left:3px solid transparent; cursor:pointer; }
   .side-item.active{ color:var(--green-deep); font-weight:bold; border-left-color:var(--green); background:var(--green-bg); }
-  .side-divider{ margin:16px 28px; border-top:1px solid var(--line); }
-  .side-label{ font-family:Arial,sans-serif; font-size:10.5px; letter-spacing:.5px; color:#8B9488; padding:0 28px; margin-bottom:6px; }
-  .side-fact{ font-family:Arial,sans-serif; font-size:11.5px; color:var(--ink-soft); padding:0 28px; line-height:1.5; }
-  .main{ flex:1; padding:26px 32px 40px; }
-  .ledger{ display:flex; border-top:1px solid var(--ink); border-bottom:1px solid var(--ink); padding:16px 0; margin-bottom:26px; }
-  .ledger-item{ flex:1; padding:0 24px; border-left:1px solid var(--line); }
-  .ledger-item:first-child{ border-left:none; padding-left:0; }
-  .ledger-num{ font-size:26px; font-weight:bold; color:var(--ink); font-family:Georgia,serif; }
+  .side-divider{ margin:16px 24px; border-top:1px solid var(--line); }
+  .side-label{ font-family:Arial,sans-serif; font-size:10.5px; letter-spacing:.5px; color:#8B9488; padding:0 24px; margin-bottom:6px; font-weight:bold; }
+  .side-fact{ font-family:Arial,sans-serif; font-size:11.5px; color:var(--ink-soft); padding:0 24px; line-height:1.5; }
+  .main{ flex:1; padding:24px 32px 40px; }
+  .ledger{ display:flex; border-top:1px solid var(--ink); border-bottom:1px solid var(--ink); padding:16px 0; margin-bottom:24px; background:var(--panel); }
+  .ledger-item{ flex:1; padding:0 20px; border-left:1px solid var(--line); }
+  .ledger-item:first-child{ border-left:none; padding-left:15px; }
+  .ledger-num{ font-size:24px; font-weight:bold; color:var(--ink); font-family:Georgia,serif; }
   .ledger-num.flag{ color:var(--red); }
-  .ledger-label{ font-family:Arial,sans-serif; font-size:11.5px; color:var(--ink-soft); margin-top:3px; }
-  .section-head{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:14px; }
-  .section-title{ font-size:18px; font-weight:bold; }
-  .section-sub{ font-family:Arial,sans-serif; font-size:12px; color:var(--ink-soft); }
-  .work-area{ display:flex; gap:22px; align-items:flex-start; }
-  .table-wrap{ flex:1.55; border:1px solid var(--line); border-radius:6px; overflow:hidden; background:var(--panel); }
+  .ledger-label{ font-family:Arial,sans-serif; font-size:11px; color:var(--ink-soft); margin-top:3px; }
+  .work-area{ display:flex; gap:20px; align-items:flex-start; }
+  .table-wrap{ flex:1.6; border:1px solid var(--line); border-radius:6px; overflow:hidden; background:var(--panel); max-height:650px; overflow-y:auto; }
   table{ width:100%; border-collapse:collapse; font-family:Arial,sans-serif; }
-  thead th{ text-align:left; font-size:10.5px; letter-spacing:.4px; color:var(--ink-soft); padding:11px 14px; border-bottom:1px solid var(--line); background:var(--grey-bg); font-weight:bold; }
-  tbody td{ padding:13px 14px; border-bottom:1px solid var(--line); font-size:12.5px; vertical-align:top; }
-  tbody tr:last-child td{ border-bottom:none; }
-  tbody tr.selected{ background:var(--green-bg); }
+  thead th{ position:sticky; top:0; text-align:left; font-size:10.5px; letter-spacing:.4px; color:var(--ink-soft); padding:11px 12px; border-bottom:1px solid var(--line); background:var(--grey-bg); font-weight:bold; z-index:2; }
+  tbody td{ padding:11px 12px; border-bottom:1px solid var(--line); font-size:12px; vertical-align:top; }
+  tbody tr{ cursor:pointer; }
+  tbody tr:hover{ background:var(--green-bg); }
+  tbody tr.selected{ background:var(--green-bg); font-weight:500; }
   .co-name{ font-family:Georgia,serif; font-weight:bold; font-size:13px; color:var(--ink); }
-  .co-sim{ font-size:10px; color:#9AA39A; font-style:italic; }
-  .pasal{ font-size:11px; color:var(--ink-soft); }
-  .badge{ display:inline-block; padding:3px 9px; border-radius:20px; font-size:10.5px; font-weight:bold; }
+  .co-sim{ font-size:10px; color:#7C877C; }
+  .badge{ display:inline-block; padding:3px 8px; border-radius:12px; font-size:10px; font-weight:bold; }
   .badge.tinggi{ background:var(--red-bg); color:var(--red); }
   .badge.sedang{ background:var(--amber-bg); color:var(--amber); }
-  .badge.rendah{ background:var(--grey-bg); color:#7C877C; }
-  .status{ font-size:11.5px; }
-  .status.baru{ color:var(--green-deep); font-weight:bold; }
-  .detail{ flex:1; border:1px solid var(--ink); border-radius:6px; background:var(--panel); overflow:hidden; }
-  .detail-head{ padding:16px 18px; border-bottom:1px solid var(--line); background:var(--ink); color:#fff; }
+  .badge.rendah{ background:var(--grey-bg); color:#5A655A; }
+  .badge.bersih{ background:var(--green-bg); color:var(--green-deep); }
+  .detail{ flex:1; border:1px solid var(--ink); border-radius:6px; background:var(--panel); overflow:hidden; position:sticky; top:20px; }
+  .detail-head{ padding:14px 16px; border-bottom:1px solid var(--line); background:var(--ink); color:#fff; }
   .detail-head .co{ font-family:Georgia,serif; font-size:15px; font-weight:bold; }
-  .detail-head .meta{ font-family:Arial,sans-serif; font-size:11px; color:#B9C2CE; margin-top:3px; }
-  .detail-body{ padding:18px; }
-  .analysis-block{ border-left:3px solid var(--green); background:var(--green-bg); padding:12px 14px; border-radius:4px; margin-bottom:14px; }
-  .analysis-label{ font-family:Arial,sans-serif; font-size:10px; letter-spacing:.4px; color:var(--green-deep); font-weight:bold; margin-bottom:5px; }
-  .analysis-text{ font-family:Arial,sans-serif; font-size:11.5px; color:var(--ink); line-height:1.5; }
-  .pasal-ref{ font-family:Arial,sans-serif; font-size:11px; color:var(--ink-soft); margin-bottom:14px; }
-  .pasal-ref b{ color:var(--ink); }
-  .rec-box{ font-family:Arial,sans-serif; font-size:11px; color:var(--ink-soft); border-top:1px dashed var(--line); padding-top:12px; font-style:italic; }
-  .disclaimer{ margin-top:22px; padding:12px 16px; background:var(--grey-bg); border-radius:5px; font-family:Arial,sans-serif; font-size:10.5px; color:var(--ink-soft); text-align:center; }
-  .live-tag{ font-family:Arial,sans-serif; font-size:10px; background:var(--green); color:#fff; padding:3px 8px; border-radius:4px; letter-spacing:.4px; margin-left:8px; }
+  .detail-head .meta{ font-family:Arial,sans-serif; font-size:11px; color:#B9C2CE; margin-top:2px; }
+  .detail-body{ padding:16px; font-family:Arial,sans-serif; }
+  .analysis-block{ border-left:3px solid var(--green); background:var(--green-bg); padding:10px 12px; border-radius:4px; margin-bottom:12px; }
+  .analysis-label{ font-size:10px; letter-spacing:.4px; color:var(--green-deep); font-weight:bold; margin-bottom:4px; }
+  .analysis-text{ font-size:11.5px; color:var(--ink); line-height:1.4; }
+  .btn-veto{ width:100%; padding:10px; background:var(--amber); color:#fff; border:none; border-radius:5px; font-weight:bold; cursor:pointer; margin-top:10px; font-size:12px; }
+  .btn-veto:hover{ background:#966120; }
+  .pstv-tag{ display:inline-block; font-size:9.5px; background:var(--grey-bg); padding:2px 6px; border-radius:4px; margin-top:3px; color:var(--ink-soft); font-weight:bold; }
 </style>
 </head>
 <body>
@@ -76,54 +72,48 @@
   <div class="brand">
     <div class="mark">JK</div>
     <div>
-      <div class="name">JEJAK Kepatuhan <span class="live-tag">DATA DARI ENGINE.PY</span></div>
-      <div class="tag">DASHBOARD PRIORITAS KASUS — PURWARUPA FUNGSIONAL</div>
+      <div class="name">JEJAK Kepatuhan <span style="font-size:11px; background:var(--green); color:#fff; padding:2px 6px; border-radius:4px;" class="data-sans">LIVE DASHBOARD</span></div>
+      <div class="tag">SIMULASI AUDIT PEMBERI KERJA · 22 OKTOBER 2026</div>
     </div>
   </div>
   <div class="topbar-right">
     <div class="auditor">
-      <div class="who">Dewi Anggraini</div>
-      <div class="where">Auditor Kepatuhan &middot; BPJS Kesehatan Cabang Bandung</div>
+      <div class="who" id="user-display">Johannes Sipahutar, S.H.</div>
+      <div class="role" id="role-display">Analis Tingkat Pertama (Auditor)</div>
     </div>
-    <div class="avatar">DA</div>
+    <button onclick="toggleModeSecure()" style="font-family:Arial; font-size:11px; padding:6px 10px; cursor:pointer; background:var(--grey-bg); border:1px solid var(--line); border-radius:4px;">🔑 Switch Role (Veto Master)</button>
+    <div class="avatar" id="avatar-display">JS</div>
   </div>
 </div>
 
 <div class="app">
   <div class="sidebar">
-    <div class="side-item active">Dashboard</div>
-    <div class="side-item">Kasus Prioritas</div>
-    <div class="side-item">Basis Hukum</div>
-    <div class="side-item">Data Simulasi</div>
-    <div class="side-item">Pengaturan</div>
+    <div class="side-item active" id="menu-all" onclick="filterTable('ALL')">Semua Kasus</div>
+    <div class="side-item" id="menu-tinggi" onclick="filterTable('TINGGI')">Prioritas Tinggi</div>
+    <div class="side-item" id="menu-umkm" onclick="filterTable('UMKM')">Klaster UMKM</div>
     <div class="side-divider"></div>
-    <div class="side-label data-sans">BASIS HUKUM AKTIF</div>
-    <div class="side-fact">5 instrumen hukum termuat<br>12 kriteria ambang aktif<br>Terakhir dimutakhirkan: Agu 2026</div>
+    <div class="side-label">SEGMENTASI PSTV08</div>
+    <div class="side-fact">• Pekerja Penerima Upah (PPU)<br>• PBPU / Mandiri<br>• Bukan Pekerja (BP)<br>• PBI APBN & APBD</div>
   </div>
 
   <div class="main">
     <div class="ledger">
       <div class="ledger-item">
-        <div class="ledger-num">12</div>
-        <div class="ledger-label">Kasus Dipantau (simulasi)</div>
+        <div class="ledger-num" id="stat-total">0</div>
+        <div class="ledger-label">Total Entitas Dipantau</div>
       </div>
       <div class="ledger-item">
-        <div class="ledger-num flag">3</div>
-        <div class="ledger-label">Prioritas Tinggi</div>
+        <div class="ledger-num flag" id="stat-tinggi">0</div>
+        <div class="ledger-label">Indikasi Tinggi (Perlu Audit)</div>
       </div>
       <div class="ledger-item">
-        <div class="ledger-num">3</div>
-        <div class="ledger-label">Prioritas Sedang / Menunggu Tinjauan</div>
+        <div class="ledger-num" id="stat-sedang" style="color:var(--amber);">0</div>
+        <div class="ledger-label">Indikasi Sedang (Klarifikasi)</div>
       </div>
       <div class="ledger-item">
-        <div class="ledger-num">Rp 11.900.000</div>
-        <div class="ledger-label">Estimasi Selisih Upah Bulanan (kumulatif)</div>
+        <div class="ledger-num" id="stat-selisih">Rp 0</div>
+        <div class="ledger-label">Agregat Selisih Upah Bulanan</div>
       </div>
-    </div>
-
-    <div class="section-head">
-      <div class="section-title">Antrean Kasus</div>
-      <div class="section-sub">Diurutkan berdasarkan skor keyakinan tertinggi &mdash; hasil engine.py</div>
     </div>
 
     <div class="work-area">
@@ -131,79 +121,248 @@
         <table>
           <thead>
             <tr>
-              <th>Pemberi Kerja</th>
-              <th>Indikasi</th>
-              <th>Pasal Rujukan</th>
+              <th>Pemberi Kerja / Entitas</th>
+              <th>Skala Usaha</th>
+              <th>PSTV08</th>
+              <th>Indikasi Kepatuhan</th>
               <th>Keyakinan</th>
-              <th>Status</th>
             </tr>
           </thead>
-          <tbody>
-            <tr class="selected">
-              <td><div class="co-name">PT Cahaya Nusantara Logistik</div><div class="co-sim">data simulasi &middot; Korporasi</div></td>
-              <td>Misklasifikasi Status Kerja; Under-Reporting Upah</td>
-              <td class="pasal">Psl 15 ayat (1) &amp; Psl 59 ayat (3)</td>
-              <td><span class="badge tinggi">Tinggi &middot; 96%</span></td>
-              <td class="status baru">Baru</td>
-            </tr>
-            <tr class="">
-              <td><div class="co-name">PT Boga Rasa Nusantara</div><div class="co-sim">data simulasi &middot; Korporasi</div></td>
-              <td>Misklasifikasi Status Kerja; Under-Reporting Upah</td>
-              <td class="pasal">Psl 15 ayat (1) &amp; Psl 59 ayat (3)</td>
-              <td><span class="badge tinggi">Tinggi &middot; 96%</span></td>
-              <td class="status baru">Baru</td>
-            </tr>
-            <tr class="">
-              <td><div class="co-name">PT Andalan Prima Farma</div><div class="co-sim">data simulasi &middot; Korporasi</div></td>
-              <td>Misklasifikasi Status Kerja; Under-Reporting Upah</td>
-              <td class="pasal">Psl 15 ayat (1) &amp; Psl 59 ayat (3)</td>
-              <td><span class="badge tinggi">Tinggi &middot; 96%</span></td>
-              <td class="status baru">Baru</td>
-            </tr>
-            <tr class="">
-              <td><div class="co-name">CV Mitra Sejahtera Konstruksi</div><div class="co-sim">data simulasi &middot; UMKM</div></td>
-              <td>Under-Reporting Upah</td>
-              <td class="pasal">Psl 15 ayat (1)</td>
-              <td><span class="badge sedang">Sedang &middot; 45%</span></td>
-              <td class="status baru">Baru</td>
-            </tr>
-            <tr class="">
-              <td><div class="co-name">PT Graha Abadi Sentosa</div><div class="co-sim">data simulasi &middot; Korporasi</div></td>
-              <td>Under-Reporting Upah</td>
-              <td class="pasal">Psl 15 ayat (1)</td>
-              <td><span class="badge sedang">Sedang &middot; 45%</span></td>
-              <td class="status baru">Baru</td>
-            </tr>
-            <tr class="">
-              <td><div class="co-name">CV Berkah Jaya Konstruksi</div><div class="co-sim">data simulasi &middot; UMKM</div></td>
-              <td>PKWT Melebihi Batas Maksimal</td>
-              <td class="pasal">Psl 8 PP No. 35/2021</td>
-              <td><span class="badge sedang">Sedang &middot; 40%</span></td>
-              <td class="status baru">Baru</td>
-            </tr>
-          </tbody>
+          <tbody id="table-body"></tbody>
         </table>
       </div>
 
-      <div class="detail">
+      <div class="detail" id="detail-panel">
         <div class="detail-head">
-          <div class="co">PT Cahaya Nusantara Logistik</div>
-          <div class="meta">Kasus #C-001 &middot; Skor 96%</div>
+          <div class="co" id="det-co">Pilih Kasus</div>
+          <div class="meta" id="det-meta">Klik salah satu baris untuk melihat rincian</div>
         </div>
         <div class="detail-body">
           <div class="analysis-block">
-            <div class="analysis-label">ANALISIS JEJAK KEPATUHAN (OUTPUT ENGINE.PY)</div>
-            <div class="analysis-text">Kontrak terdeteksi berstatus TETAP sejak 12 Maret 2019. namun dilaporkan ke BPJS sebagai "Tenaga Lepas / Harian Lepas".</div>
+            <div class="analysis-label">HASIL PEMROSESAN OTOMATIS</div>
+            <div class="analysis-text" id="det-text">Pilih data sampel pada tabel di samping.</div>
           </div>
-          <div class="pasal-ref"><b>Rujukan:</b> Pasal 15 ayat (1) UU No. 24/2011 (BPJS); Pasal 59 ayat (3) UU Cipta Kerja</div>
-          <div class="rec-box">Diteruskan untuk verifikasi lanjutan oleh auditor. Ini indikasi prioritas dari proses otomatis, bukan keputusan atau vonis final.</div>
+          <div style="font-size:11px; color:var(--ink-soft); margin-bottom:10px;" id="det-pasal"></div>
+          <button class="btn-veto" id="btn-veto-act" onclick="eksekusiVeto()" style="display:none;">✏️ Lakukan Koreksi / VETO Master</button>
         </div>
       </div>
     </div>
-
-    <div class="disclaimer">Seluruh nama perusahaan dan data pada tampilan ini adalah simulasi (dataset.py) yang diproses oleh mesin deteksi sungguhan (engine.py) &mdash; bukan data peserta JKN sebenarnya.</div>
   </div>
 </div>
 
+<script>
+let currentRole = "AUDITOR";
+let selectedIndex = 0;
+let rawData = [];
+let filteredData = [];
+let currentFilter = "ALL";
+let failedAttempts = 0;
+
+const MASTER_HASH = "d2d5382d34c986025cc325400def54b30257df34fc45e1fcd2731f8fea5eb73d";
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+const DOK_TYPES = ["PT", "CV", "UD", "Toko", "Bengkel", "Katering", "Apotek", "Retail Convenience Market", "Koperasi", "Klinik Pratama"];
+const NAMA_USAHA = ["Nusantara Jaya", "Boga Rasa", "Maju Bersama", "Cahaya Abadi", "Sejahtera Pratama", "Mitra Utama", "Sumber Rejeki", "Karya Mandiri", "Sentosa Logistik", "Indah Gemilang"];
+const PSTV_LIST = ["PPU (Pekerja Penerima Upah)", "PBPU (Mandiri)", "BP (Bukan Pekerja)", "PBI APBN", "PBI APBD"];
+
+function initData() {
+  rawData = [];
+  
+  // 1. BACA DATA UPLOAD BARU DARI LOCALSTORAGE (JIKA ADA DARI demo_jejak.html)
+  const localLogs = JSON.parse(localStorage.getItem("jejak_audit_logs") || "[]");
+  localLogs.forEach((item, idx) => {
+    rawData.push({
+      id: `UPLOAD-${String(idx+1).padStart(3, '0')}`,
+      perusahaan: item.perusahaan || "(Hasil Upload Master)",
+      skala_usaha: item.skala || "Korporasi",
+      pstv08: item.pstv08 || "PPU",
+      upah_slip: item.upah_slip || 0,
+      upah_bpjs: item.upah_bpjs || 0,
+      selisih: (item.upah_slip || 0) - (item.upah_bpjs || 0),
+      flags: item.flags || [],
+      pasal: item.pasal || ["Pasal 15 UU No. 24/2011"],
+      skor: item.skor || 90,
+      label: item.label || "Tinggi",
+      status_audit: "INPUT_MANUAL_BARU"
+    });
+  });
+
+  // 2. GENERATE 100 DATA FIKTIF EKSISTING
+  for (let i = 1; i <= 100; i++) {
+    const jenis = DOK_TYPES[i % DOK_TYPES.length];
+    const nama = `${jenis} ${NAMA_USAHA[i % NAMA_USAHA.length]} ${i}`;
+    const skala = (jenis === "PT") ? "Korporasi" : "UMKM";
+    const pstv = PSTV_LIST[i % PSTV_LIST.length];
+    
+    let upahSlip = 4500000 + (i * 100000);
+    let upahBpjs = upahSlip;
+    let flags = [];
+    let pasal = [];
+    let skor = 0;
+    let label = "Tidak Ada Indikasi";
+
+    if (i % 3 === 0) {
+      upahBpjs = Math.round(upahSlip * 0.6);
+      flags.push("Under-Reporting Upah (selisih >20%)");
+      flags.push("Misklasifikasi Status Kerja");
+      pasal.push("Pasal 15 UU No. 24/2011");
+      pasal.push("Pasal 59 UU Cipta Kerja");
+      skor = 95; label = "Tinggi";
+    } else if (i % 5 === 0) {
+      upahBpjs = Math.round(upahSlip * 0.82);
+      flags.push("Indikasi Selisih Upah Tipis");
+      pasal.push("Pasal 15 UU No. 24/2011");
+      skor = 45; label = "Sedang";
+    }
+
+    rawData.push({
+      id: `C-${String(i).padStart(3, '0')}`,
+      perusahaan: nama,
+      skala_usaha: skala,
+      pstv08: pstv,
+      upah_slip: upahSlip,
+      upah_bpjs: upahBpjs,
+      selisih: upahSlip - upahBpjs,
+      flags: flags,
+      pasal: pasal,
+      skor: skor,
+      label: label,
+      status_audit: "DRAFT_VERIFIKASI_LAPANGAN"
+    });
+  }
+  
+  filterTable('ALL');
+}
+
+function filterTable(type) {
+  currentFilter = type;
+  document.getElementById("menu-all").className = "side-item" + (type === 'ALL' ? " active" : "");
+  document.getElementById("menu-tinggi").className = "side-item" + (type === 'TINGGI' ? " active" : "");
+  document.getElementById("menu-umkm").className = "side-item" + (type === 'UMKM' ? " active" : "");
+
+  if (type === 'ALL') {
+    filteredData = rawData;
+  } else if (type === 'TINGGI') {
+    filteredData = rawData.filter(x => x.label === "Tinggi");
+  } else if (type === 'UMKM') {
+    filteredData = rawData.filter(x => x.skala_usaha === "UMKM");
+  }
+  
+  selectedIndex = 0;
+  render();
+}
+
+function render() {
+  const tbody = document.getElementById("table-body");
+  tbody.innerHTML = "";
+  
+  let totTinggi = 0, totSedang = 0, totSelisih = 0;
+
+  rawData.forEach(item => {
+    if (item.label === "Tinggi") totTinggi++;
+    if (item.label === "Sedang") totSedang++;
+    totSelisih += item.selisih;
+  });
+
+  filteredData.forEach((item, index) => {
+    const tr = document.createElement("tr");
+    if (index === selectedIndex) tr.className = "selected";
+    tr.onclick = () => selectRow(index);
+    tr.innerHTML = `
+      <td><div class="co-name">${item.perusahaan}</div><div class="co-sim">${item.id} · Status: ${item.status_audit}</div></td>
+      <td>${item.skala_usaha}</td>
+      <td><span class="pstv-tag">${item.pstv08.split(' ')[0]}</span></td>
+      <td>${item.flags.join(", ") || "Sesuai / Patuh"}</td>
+      <td><span class="badge ${item.label.toLowerCase().replace(/\s/g,'')}">${item.label} (${item.skor}%)</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById("stat-total").innerText = rawData.length;
+  document.getElementById("stat-tinggi").innerText = totTinggi;
+  document.getElementById("stat-sedang").innerText = totSedang;
+  document.getElementById("stat-selisih").innerText = "Rp " + totSelisih.toLocaleString("id-ID");
+  
+  if (filteredData.length > 0) {
+    showDetail(selectedIndex);
+  } else {
+    document.getElementById("det-co").innerText = "Tidak ada data";
+    document.getElementById("det-text").innerText = "Tidak ada entitas yang memenuhi kriteria filter ini.";
+  }
+}
+
+function showDetail(idx) {
+  selectedIndex = idx;
+  const item = filteredData[idx];
+  if (!item) return;
+
+  document.getElementById("det-co").innerText = item.perusahaan;
+  document.getElementById("det-meta").innerText = `${item.id} · ${item.skala_usaha} · Segmentasi: ${item.pstv08}`;
+  document.getElementById("det-text").innerHTML = `
+    <b>Upah di Slip Gaji:</b> Rp ${item.upah_slip.toLocaleString("id-ID")}<br>
+    <b>Upah Dilaporkan BPJS:</b> Rp ${item.upah_bpjs.toLocaleString("id-ID")}<br>
+    <b>Selisih Upah Bulanan:</b> Rp ${item.selisih.toLocaleString("id-ID")}<br><br>
+    <b>Temuan:</b> ${item.flags.join("; ") || "Tidak ditemukan indikasi pelanggaran."}
+  `;
+  document.getElementById("det-pasal").innerHTML = `<b>Rujukan Legal:</b> ${item.pasal.join(", ") || "-"}`;
+  
+  const btnVeto = document.getElementById("btn-veto-act");
+  btnVeto.style.display = (currentRole === "MASTER") ? "block" : "none";
+}
+
+function selectRow(idx) {
+  selectedIndex = idx;
+  render();
+}
+
+async function toggleModeSecure() {
+  if (failedAttempts >= 3) {
+    alert("Akses terkunci sementara karena 3 kali salah memasukkan kata sandi.");
+    return;
+  }
+
+  if (currentRole === "AUDITOR") {
+    const inputPwd = prompt("Masukkan Kata Sandi Veto Master (Super User):", "");
+    if (!inputPwd) return;
+
+    const inputHash = await sha256(inputPwd);
+    if (inputHash === MASTER_HASH) {
+      failedAttempts = 0;
+      currentRole = "MASTER";
+      document.getElementById("user-display").innerText = "Kepala Divisi Kepatuhan";
+      document.getElementById("role-display").innerText = "VETO MASTER (Super User)";
+      document.getElementById("avatar-display").innerText = "VM";
+      alert("Otorisasi Veto Master Berhasil.");
+    } else {
+      failedAttempts++;
+      alert(`Kata sandi salah! Percobaan ${failedAttempts}/3.`);
+    }
+  } else {
+    currentRole = "AUDITOR";
+    document.getElementById("user-display").innerText = "Johannes Sipahutar, S.H.";
+    document.getElementById("role-display").innerText = "Analis Tingkat Pertama (Auditor)";
+    document.getElementById("avatar-display").innerText = "JS";
+  }
+  render();
+}
+
+function eksekusiVeto() {
+  if (currentRole !== "MASTER") return;
+  const item = filteredData[selectedIndex];
+  item.label = "Tidak Ada Indikasi";
+  item.skor = 0;
+  item.flags = ["Koreksi Veto Master (Data Disahkan)"];
+  item.selisih = 0;
+  item.status_audit = "DISAHKAN_VETO_MASTER";
+  alert(`Pembetulan berhasil diproses untuk ${item.perusahaan}.`);
+  render();
+}
+
+initData();
+</script>
 </body>
 </html>
