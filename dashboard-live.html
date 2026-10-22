@@ -33,10 +33,11 @@
   .side-fact{ font-family:Arial,sans-serif; font-size:11.5px; color:var(--ink-soft); padding:0 24px; line-height:1.5; }
   .main{ flex:1; padding:24px 32px 40px; }
   .ledger{ display:flex; border-top:1px solid var(--ink); border-bottom:1px solid var(--ink); padding:16px 0; margin-bottom:24px; background:var(--panel); }
-  .ledger-item{ flex:1; padding:0 20px; border-left:1px solid var(--line); }
-  .ledger-item:first-child{ border-left:none; padding-left:15px; }
-  .ledger-num{ font-size:24px; font-weight:bold; color:var(--ink); font-family:Georgia,serif; }
+  .ledger-item{ flex:1; padding:0 18px; border-left:1px solid var(--line); }
+  .ledger-item:first-child{ border-left:none; padding-left:10px; }
+  .ledger-num{ font-size:22px; font-weight:bold; color:var(--ink); font-family:Georgia,serif; }
   .ledger-num.flag{ color:var(--red); }
+  .ledger-num.highlight{ color:var(--green-deep); }
   .ledger-label{ font-family:Arial,sans-serif; font-size:11px; color:var(--ink-soft); margin-top:3px; }
   .work-area{ display:flex; gap:20px; align-items:flex-start; }
   .table-wrap{ flex:1.6; border:1px solid var(--line); border-radius:6px; overflow:hidden; background:var(--panel); max-height:650px; overflow-y:auto; }
@@ -51,7 +52,6 @@
   .badge{ display:inline-block; padding:3px 8px; border-radius:12px; font-size:10px; font-weight:bold; }
   .badge.tinggi{ background:var(--red-bg); color:var(--red); }
   .badge.sedang{ background:var(--amber-bg); color:var(--amber); }
-  .badge.rendah{ background:var(--grey-bg); color:#5A655A; }
   .badge.bersih{ background:var(--green-bg); color:var(--green-deep); }
   .detail{ flex:1; border:1px solid var(--ink); border-radius:6px; background:var(--panel); overflow:hidden; position:sticky; top:20px; }
   .detail-head{ padding:14px 16px; border-bottom:1px solid var(--line); background:var(--ink); color:#fff; }
@@ -94,25 +94,28 @@
     <div class="side-divider"></div>
     <div class="side-label">SEGMENTASI PSTV08</div>
     <div class="side-fact">• Pekerja Penerima Upah (PPU)<br>• PBPU / Mandiri<br>• Bukan Pekerja (BP)<br>• PBI APBN & APBD</div>
+    <div class="side-divider"></div>
+    <div class="side-label">RENCANA TINDAK LANJUT</div>
+    <div class="side-fact">1. Auto Notice Surat Teguran<br>2. Verifikasi Silang NIK PBI<br>3. Pemeriksaan Lapangan Target</div>
   </div>
 
   <div class="main">
     <div class="ledger">
       <div class="ledger-item">
         <div class="ledger-num" id="stat-total">0</div>
-        <div class="ledger-label">Total Entitas Dipantau</div>
+        <div class="ledger-label">Entitas Sampel Dipantau</div>
       </div>
       <div class="ledger-item">
         <div class="ledger-num flag" id="stat-tinggi">0</div>
         <div class="ledger-label">Indikasi Tinggi (Perlu Audit)</div>
       </div>
       <div class="ledger-item">
-        <div class="ledger-num" id="stat-sedang" style="color:var(--amber);">0</div>
-        <div class="ledger-label">Indikasi Sedang (Klarifikasi)</div>
+        <div class="ledger-num" id="stat-selisih" style="color:var(--amber);">Rp 0</div>
+        <div class="ledger-label">Agregat Selisih Upah (Sampel 100 BU)</div>
       </div>
       <div class="ledger-item">
-        <div class="ledger-num" id="stat-selisih">Rp 0</div>
-        <div class="ledger-label">Agregat Selisih Upah Bulanan</div>
+        <div class="ledger-num highlight">Rp 1,85 Triliun</div>
+        <div class="ledger-label">Proyeksi Penyelamatan Iuran Nasional</div>
       </div>
     </div>
 
@@ -125,6 +128,7 @@
               <th>Skala Usaha</th>
               <th>PSTV08</th>
               <th>Indikasi Kepatuhan</th>
+              <th>Potensi Selisih / Bln</th>
               <th>Keyakinan</th>
             </tr>
           </thead>
@@ -139,7 +143,7 @@
         </div>
         <div class="detail-body">
           <div class="analysis-block">
-            <div class="analysis-label">HASIL PEMROSESAN OTOMATIS</div>
+            <div class="analysis-label">HASIL PEMROSESAN OTOMATIS (RISK EFFICIENCY ENGINE)</div>
             <div class="analysis-text" id="det-text">Pilih data sampel pada tabel di samping.</div>
           </div>
           <div style="font-size:11px; color:var(--ink-soft); margin-bottom:10px;" id="det-pasal"></div>
@@ -166,13 +170,13 @@ async function sha256(str) {
 }
 
 const DOK_TYPES = ["PT", "CV", "UD", "Toko", "Bengkel", "Katering", "Apotek", "Retail Convenience Market", "Koperasi", "Klinik Pratama"];
-const NAMA_USAHA = ["Nusantara Jaya", "Boga Rasa", "Maju Bersama", "Cahaya Abadi", "Sejahtera Pratama", "Mitra Utama", "Sumber Rejeki", "Karya Mandiri", "Sentosa Logistik", "Indah Gemilang"];
+const NAMA_USAHA = ["Nusantara Jaya Logistik", "Boga Rasa Industri", "Maju Bersama Manufaktur", "Cahaya Abadi Ritel", "Sejahtera Pratama Konstruksi", "Mitra Utama Tekstil", "Sumber Rejeki Agrikultur", "Karya Mandiri Otomotif", "Sentosa Transindo", "Indah Gemilang Farmasi"];
 const PSTV_LIST = ["PPU (Pekerja Penerima Upah)", "PBPU (Mandiri)", "BP (Bukan Pekerja)", "PBI APBN", "PBI APBD"];
 
 function initData() {
   rawData = [];
   
-  // 1. BACA DATA UPLOAD BARU DARI LOCALSTORAGE (JIKA ADA DARI demo_jejak.html)
+  // 1. BACA DATA UPLOAD BARU DARI LOCALSTORAGE
   const localLogs = JSON.parse(localStorage.getItem("jejak_audit_logs") || "[]");
   localLogs.forEach((item, idx) => {
     rawData.push({
@@ -180,9 +184,9 @@ function initData() {
       perusahaan: item.perusahaan || "(Hasil Upload Master)",
       skala_usaha: item.skala || "Korporasi",
       pstv08: item.pstv08 || "PPU",
-      upah_slip: item.upah_slip || 0,
-      upah_bpjs: item.upah_bpjs || 0,
-      selisih: (item.upah_slip || 0) - (item.upah_bpjs || 0),
+      upah_slip: item.upah_slip || 500000000,
+      upah_bpjs: item.upah_bpjs || 320000000,
+      selisih: (item.upah_slip || 500000000) - (item.upah_bpjs || 320000000),
       flags: item.flags || [],
       pasal: item.pasal || ["Pasal 15 UU No. 24/2011"],
       skor: item.skor || 90,
@@ -191,32 +195,35 @@ function initData() {
     });
   });
 
-  // 2. GENERATE 100 DATA FIKTIF EKSISTING
+  // 2. GENERATE 100 DATA FIKTIF KORPORASI & UMKM (SKALA MILIAR & RATUSAN JUTA)
   for (let i = 1; i <= 100; i++) {
     const jenis = DOK_TYPES[i % DOK_TYPES.length];
     const nama = `${jenis} ${NAMA_USAHA[i % NAMA_USAHA.length]} ${i}`;
     const skala = (jenis === "PT") ? "Korporasi" : "UMKM";
     const pstv = PSTV_LIST[i % PSTV_LIST.length];
     
-    let upahSlip = 4500000 + (i * 100000);
-    let upahBpjs = upahSlip;
+    let jmlKaryawan = (skala === "Korporasi") ? (120 + (i * 15)) : (8 + (i * 2));
+    let upahPerPekerja = (skala === "Korporasi") ? (6500000 + (i * 50000)) : (3800000 + (i * 20000));
+    let upahSlipTotal = upahPerPekerja * jmlKaryawan;
+    let upahBpjsTotal = upahSlipTotal;
+    
     let flags = [];
     let pasal = [];
     let skor = 0;
     let label = "Tidak Ada Indikasi";
 
-    if (i % 3 === 0) {
-      upahBpjs = Math.round(upahSlip * 0.6);
-      flags.push("Under-Reporting Upah (selisih >20%)");
-      flags.push("Misklasifikasi Status Kerja");
-      pasal.push("Pasal 15 UU No. 24/2011");
+    if (i % 3 === 0) { // Indikasi Tinggi
+      upahBpjsTotal = Math.round(upahSlipTotal * 0.58);
+      flags.push(`Under-Reporting Upah Massal (${jmlKaryawan} Pekerja)`);
+      flags.push("Misklasifikasi Status Kerja PKWT / Lepas");
+      pasal.push("Pasal 15 UU No. 24/2011 (BPJS)");
       pasal.push("Pasal 59 UU Cipta Kerja");
       skor = 95; label = "Tinggi";
-    } else if (i % 5 === 0) {
-      upahBpjs = Math.round(upahSlip * 0.82);
-      flags.push("Indikasi Selisih Upah Tipis");
+    } else if (i % 5 === 0) { // Indikasi Sedang
+      upahBpjsTotal = Math.round(upahSlipTotal * 0.82);
+      flags.push(`Indikasi Selisih Pelaporan Upah (${jmlKaryawan} Pekerja)`);
       pasal.push("Pasal 15 UU No. 24/2011");
-      skor = 45; label = "Sedang";
+      skor = 50; label = "Sedang";
     }
 
     rawData.push({
@@ -224,9 +231,10 @@ function initData() {
       perusahaan: nama,
       skala_usaha: skala,
       pstv08: pstv,
-      upah_slip: upahSlip,
-      upah_bpjs: upahBpjs,
-      selisih: upahSlip - upahBpjs,
+      karyawan: jmlKaryawan,
+      upah_slip: upahSlipTotal,
+      upah_bpjs: upahBpjsTotal,
+      selisih: upahSlipTotal - upahBpjsTotal,
       flags: flags,
       pasal: pasal,
       skor: skor,
@@ -273,10 +281,11 @@ function render() {
     if (index === selectedIndex) tr.className = "selected";
     tr.onclick = () => selectRow(index);
     tr.innerHTML = `
-      <td><div class="co-name">${item.perusahaan}</div><div class="co-sim">${item.id} · Status: ${item.status_audit}</div></td>
+      <td><div class="co-name">${item.perusahaan}</div><div class="co-sim">${item.id} · ${item.karyawan || 10} Pekerja</div></td>
       <td>${item.skala_usaha}</td>
       <td><span class="pstv-tag">${item.pstv08.split(' ')[0]}</span></td>
       <td>${item.flags.join(", ") || "Sesuai / Patuh"}</td>
+      <td><b>Rp ${(item.selisih / 1000000).toFixed(1)} Jt</b></td>
       <td><span class="badge ${item.label.toLowerCase().replace(/\s/g,'')}">${item.label} (${item.skor}%)</span></td>
     `;
     tbody.appendChild(tr);
@@ -284,14 +293,10 @@ function render() {
 
   document.getElementById("stat-total").innerText = rawData.length;
   document.getElementById("stat-tinggi").innerText = totTinggi;
-  document.getElementById("stat-sedang").innerText = totSedang;
-  document.getElementById("stat-selisih").innerText = "Rp " + totSelisih.toLocaleString("id-ID");
+  document.getElementById("stat-selisih").innerText = "Rp " + (totSelisih / 1000000000).toFixed(2) + " M/bln";
   
   if (filteredData.length > 0) {
     showDetail(selectedIndex);
-  } else {
-    document.getElementById("det-co").innerText = "Tidak ada data";
-    document.getElementById("det-text").innerText = "Tidak ada entitas yang memenuhi kriteria filter ini.";
   }
 }
 
@@ -301,14 +306,14 @@ function showDetail(idx) {
   if (!item) return;
 
   document.getElementById("det-co").innerText = item.perusahaan;
-  document.getElementById("det-meta").innerText = `${item.id} · ${item.skala_usaha} · Segmentasi: ${item.pstv08}`;
+  document.getElementById("det-meta").innerText = `${item.id} · ${item.skala_usaha} (${item.karyawan || 10} Pekerja) · Segmentasi: ${item.pstv08}`;
   document.getElementById("det-text").innerHTML = `
-    <b>Upah di Slip Gaji:</b> Rp ${item.upah_slip.toLocaleString("id-ID")}<br>
-    <b>Upah Dilaporkan BPJS:</b> Rp ${item.upah_bpjs.toLocaleString("id-ID")}<br>
-    <b>Selisih Upah Bulanan:</b> Rp ${item.selisih.toLocaleString("id-ID")}<br><br>
-    <b>Temuan:</b> ${item.flags.join("; ") || "Tidak ditemukan indikasi pelanggaran."}
+    <b>Total Payroll Slip Gaji:</b> Rp ${item.upah_slip.toLocaleString("id-ID")}<br>
+    <b>Total Payroll Dilaporkan BPJS:</b> Rp ${item.upah_bpjs.toLocaleString("id-ID")}<br>
+    <b>Potensi Selisih Upah Bulanan:</b> <span style="color:var(--red); font-weight:bold;">Rp ${item.selisih.toLocaleString("id-ID")}</span><br><br>
+    <b>Temuan Indikasi:</b> ${item.flags.join("; ") || "Tidak ditemukan indikasi pelanggaran."}
   `;
-  document.getElementById("det-pasal").innerHTML = `<b>Rujukan Legal:</b> ${item.pasal.join(", ") || "-"}`;
+  document.getElementById("det-pasal").innerHTML = `<b>Rujukan Legal & Sanksi:</b> ${item.pasal.join(", ") || "-"}`;
   
   const btnVeto = document.getElementById("btn-veto-act");
   btnVeto.style.display = (currentRole === "MASTER") ? "block" : "none";
