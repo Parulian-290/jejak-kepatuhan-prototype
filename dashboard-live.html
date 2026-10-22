@@ -53,6 +53,7 @@
   .badge.tinggi{ background:var(--red-bg); color:var(--red); }
   .badge.sedang{ background:var(--amber-bg); color:var(--amber); }
   .badge.bersih{ background:var(--green-bg); color:var(--green-deep); }
+  .badge-new{ background:#2B6CB0; color:#fff; padding:2px 6px; border-radius:4px; font-size:9px; font-weight:bold; margin-left:6px; display:inline-block; }
   .detail{ flex:1; border:1px solid var(--ink); border-radius:6px; background:var(--panel); overflow:hidden; position:sticky; top:20px; }
   .detail-head{ padding:14px 16px; border-bottom:1px solid var(--line); background:var(--ink); color:#fff; }
   .detail-head .co{ font-family:Georgia,serif; font-size:15px; font-weight:bold; }
@@ -111,7 +112,7 @@
       </div>
       <div class="ledger-item">
         <div class="ledger-num" id="stat-selisih" style="color:var(--amber);">Rp 0</div>
-        <div class="ledger-label">Agregat Selisih Upah (Sampel 100 BU)</div>
+        <div class="ledger-label">Agregat Selisih Upah (Sampel BU)</div>
       </div>
       <div class="ledger-item">
         <div class="ledger-num highlight">Rp 1,85 Triliun</div>
@@ -176,26 +177,27 @@ const PSTV_LIST = ["PPU (Pekerja Penerima Upah)", "PBPU (Mandiri)", "BP (Bukan P
 function initData() {
   rawData = [];
   
-  // 1. BACA DATA UPLOAD BARU DARI LOCALSTORAGE
+  // BACA DATA INPUTAN DARI DEMO_JEJAK.HTML VIA LOCALSTORAGE
   const localLogs = JSON.parse(localStorage.getItem("jejak_audit_logs") || "[]");
   localLogs.forEach((item, idx) => {
     rawData.push({
-      id: `UPLOAD-${String(idx+1).padStart(3, '0')}`,
+      id: item.id || `UPLOAD-${String(idx+1).padStart(3, '0')}`,
       perusahaan: item.perusahaan || "(Hasil Upload Master)",
       skala_usaha: item.skala || "Korporasi",
       pstv08: item.pstv08 || "PPU",
       upah_slip: item.upah_slip || 500000000,
       upah_bpjs: item.upah_bpjs || 320000000,
-      selisih: (item.upah_slip || 500000000) - (item.upah_bpjs || 320000000),
+      selisih: item.selisih || ((item.upah_slip || 500000000) - (item.upah_bpjs || 320000000)),
       flags: item.flags || [],
       pasal: item.pasal || ["Pasal 15 UU No. 24/2011"],
       skor: item.skor || 90,
       label: item.label || "Tinggi",
-      status_audit: "INPUT_MANUAL_BARU"
+      status_audit: "INPUT_MANUAL_BARU",
+      is_new: true
     });
   });
 
-  // 2. GENERATE 100 DATA FIKTIF KORPORASI & UMKM (SKALA MILIAR & RATUSAN JUTA)
+  // GENERATE 100 DATA FIKTIF DASAR KORPORASI & UMKM
   for (let i = 1; i <= 100; i++) {
     const jenis = DOK_TYPES[i % DOK_TYPES.length];
     const nama = `${jenis} ${NAMA_USAHA[i % NAMA_USAHA.length]} ${i}`;
@@ -212,14 +214,14 @@ function initData() {
     let skor = 0;
     let label = "Tidak Ada Indikasi";
 
-    if (i % 3 === 0) { // Indikasi Tinggi
+    if (i % 3 === 0) {
       upahBpjsTotal = Math.round(upahSlipTotal * 0.58);
       flags.push(`Under-Reporting Upah Massal (${jmlKaryawan} Pekerja)`);
       flags.push("Misklasifikasi Status Kerja PKWT / Lepas");
       pasal.push("Pasal 15 UU No. 24/2011 (BPJS)");
       pasal.push("Pasal 59 UU Cipta Kerja");
       skor = 95; label = "Tinggi";
-    } else if (i % 5 === 0) { // Indikasi Sedang
+    } else if (i % 5 === 0) {
       upahBpjsTotal = Math.round(upahSlipTotal * 0.82);
       flags.push(`Indikasi Selisih Pelaporan Upah (${jmlKaryawan} Pekerja)`);
       pasal.push("Pasal 15 UU No. 24/2011");
@@ -239,7 +241,8 @@ function initData() {
       pasal: pasal,
       skor: skor,
       label: label,
-      status_audit: "DRAFT_VERIFIKASI_LAPANGAN"
+      status_audit: "DRAFT_VERIFIKASI_LAPANGAN",
+      is_new: false
     });
   }
   
@@ -280,8 +283,11 @@ function render() {
     const tr = document.createElement("tr");
     if (index === selectedIndex) tr.className = "selected";
     tr.onclick = () => selectRow(index);
+    
+    const newBadge = item.is_new ? `<span class="badge-new">INPUTAN BARU</span>` : '';
+    
     tr.innerHTML = `
-      <td><div class="co-name">${item.perusahaan}</div><div class="co-sim">${item.id} · ${item.karyawan || 10} Pekerja</div></td>
+      <td><div class="co-name">${item.perusahaan}${newBadge}</div><div class="co-sim">${item.id} · ${item.karyawan || 10} Pekerja</div></td>
       <td>${item.skala_usaha}</td>
       <td><span class="pstv-tag">${item.pstv08.split(' ')[0]}</span></td>
       <td>${item.flags.join(", ") || "Sesuai / Patuh"}</td>
@@ -326,7 +332,7 @@ function selectRow(idx) {
 
 async function toggleModeSecure() {
   if (failedAttempts >= 3) {
-    alert("Akses terkunci sementara karena 3 kali salah memasukkan kata sandi.");
+    alert("Akses terkunci sementara.");
     return;
   }
 

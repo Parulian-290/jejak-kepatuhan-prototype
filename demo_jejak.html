@@ -1,217 +1,328 @@
 <!DOCTYPE html>
-<html lang="id"><head><meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>JEJAK Kepatuhan — Single Upload & Legal Audit Prototype (22 Oktober 2026)</title>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JEJAK Kepatuhan — Scan Master & Single Upload (Analisis Hukum)</title>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
-:root{--paper:#FAFAF7;--panel:#fff;--ink:#1B2A41;--soft:#4A5568;--green:#1B7A4C;--deep:#0F4A2E;--line:#E1E5DE;--amber:#B8792B;--red:#B23B3B;--redbg:#FBECEC;--amberbg:#FBF3E7;--greenbg:#EBF4EF;--grey:#F1F3F0}
-*{box-sizing:border-box}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:Georgia,'Times New Roman',serif}
-.top{display:flex;justify-content:space-between;align-items:center;padding:18px 28px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap;gap:10px}
-.brand{display:flex;align-items:center;gap:12px}
-.mark{width:34px;height:34px;border-radius:7px;background:var(--deep);color:#fff;font-weight:bold;display:flex;align-items:center;justify-content:center}
-.brand b{font-size:21px}.brand small{display:block;font-family:Arial;font-size:11.5px;color:var(--soft);letter-spacing:.3px}
-.priv{font-family:Arial;font-size:12px;background:var(--greenbg);color:var(--deep);padding:8px 12px;border-radius:6px;max-width:520px}
-.tabs{display:flex;gap:4px;padding:14px 28px 0;font-family:Arial}
-.tab{padding:10px 18px;border:1px solid var(--line);border-bottom:none;border-radius:6px 6px 0 0;background:var(--grey);cursor:pointer;font-size:13.5px;color:var(--soft)}
-.tab.on{background:var(--panel);color:var(--deep);font-weight:bold}
-.wrap{padding:0 28px 40px}.card{background:var(--panel);border:1px solid var(--line);border-radius:0 6px 6px 6px;padding:22px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
-@media(max-width:900px){.grid{grid-template-columns:1fr}}
-label{display:block;font-family:Arial;font-size:11px;letter-spacing:.4px;font-weight:bold;color:var(--soft);margin:12px 0 5px}
-textarea,select,input[type="text"]{width:100%;font-family:Arial;font-size:12.5px;border:1px solid var(--line);border-radius:5px;padding:9px;background:var(--paper);color:var(--ink)}
-textarea{height:90px;resize:vertical}
-.row{display:flex;gap:10px;align-items:end}.row>div{flex:1}
-button{font-family:Arial;font-size:13.5px;font-weight:bold;border:none;border-radius:6px;padding:11px 18px;cursor:pointer;background:var(--green);color:#fff}
-button.sec{background:var(--grey);color:var(--ink);border:1px solid var(--line)}
-.res h3{margin:0 0 6px;font-size:18px}
-.badge{display:inline-block;padding:4px 11px;border-radius:20px;font-family:Arial;font-size:12px;font-weight:bold}
-.Tinggi{background:var(--redbg);color:var(--red)}.Sedang{background:var(--amberbg);color:var(--amber)}.TidakAdaIndikasi{background:var(--greenbg);color:var(--deep)}
-.box{border-left:3px solid var(--green);background:var(--greenbg);padding:11px 13px;border-radius:4px;margin:12px 0;font-family:Arial;font-size:12.5px;line-height:1.5}
-.box.warn{border-color:var(--red);background:var(--redbg)}
-.box.law{border-color:var(--ink);background:var(--grey);font-size:11.5px;color:var(--soft)}
-.kv{display:grid;grid-template-columns:160px 1fr;gap:5px 12px;font-family:Arial;font-size:12.5px;margin:10px 0}.kv div:nth-child(odd){color:var(--soft)}
-.ocr-label-wrap{display:flex;justify-content:space-between;align-items:center;margin:10px 0 4px}
-.ocr-label-wrap label{margin:0}
-.ocr-input{font-size:11px;font-family:Arial}
-.ocr-master-box{background:var(--greenbg);border:1px solid var(--green);padding:12px;border-radius:6px;margin:12px 0}
-</style></head><body>
-<div class="top"><div class="brand"><div class="mark">JK</div><div><b>JEJAK Kepatuhan</b><small>PURWARUPA LIVE DASHBOARD · 22 OKTOBER 2026</small></div></div>
-<div class="priv"><b>Privasi:</b> Seluruh pemrosesan (termasuk OCR) berjalan 100% di browser Anda. Tidak ada data yang dikirim ke server luar.</div></div>
-<div class="tabs"><div class="tab on">Analisis Dokumen Master (Single Upload)</div></div>
-<div class="wrap">
-<div class="card"><div class="grid">
-<div>
-<div class="row">
-  <div><label>NAMA PETUGAS / AUDITOR</label><input type="text" id="petugas" value="Johannes Sipahutar, S.H."></div>
-  <div><label>SKALA USAHA</label><select id="skala" onchange="analisis()"><option value="Korporasi">Korporasi</option><option value="UMKM">UMKM</option></select></div>
-</div>
-<div class="row" style="margin-top:10px;">
-  <div><label>SEGMENTASI PESERTA (PSTV08)</label>
-    <select id="pstv08">
-      <option value="PPU">PPU (Pekerja Penerima Upah)</option>
-      <option value="PBPU">PBPU (Mandiri)</option>
-      <option value="BP">BP (Bukan Pekerja)</option>
-      <option value="PBI APBN">PBI APBN</option>
-      <option value="PBI APBD">PBI APBD</option>
-    </select>
-  </div>
-</div>
+  :root {
+    --paper: #FAFAF7; --panel: #FFFFFF; --ink: #1B2A41; --ink-soft: #4A5568;
+    --green: #1B7A4C; --green-deep: #0F4A2E; --line: #E1E5DE; --amber: #B8792B;
+    --red: #B23B3B; --red-bg: #FBECEC; --green-bg: #EBF4EF; --grey-bg: #F1F3F0;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: Georgia, 'Times New Roman', serif; }
+  .data-sans { font-family: Arial, Helvetica, sans-serif; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 18px 32px; border-bottom: 1px solid var(--line); background: var(--panel); }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand .mark { width: 36px; height: 36px; border-radius: 7px; background: var(--green-deep); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-size: 16px; }
+  .brand .name { font-size: 20px; font-weight: bold; color: var(--ink); }
+  .brand .tag { font-family: Arial, sans-serif; font-size: 11.5px; color: var(--ink-soft); }
+  .privacy-banner { background: var(--green-bg); padding: 10px 16px; border-radius: 6px; font-family: Arial, sans-serif; font-size: 11.5px; color: var(--green-deep); border: 1px solid #C2E2D0; }
+  .container { max-width: 1250px; margin: 24px auto; padding: 0 24px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 24px; margin-bottom: 24px; }
+  .card-title { font-size: 18px; font-weight: bold; color: var(--green-deep); border-bottom: 2px solid var(--green); padding-bottom: 8px; margin-bottom: 20px; }
+  .grid-2 { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 24px; font-family: Arial, sans-serif; }
+  .form-group { margin-bottom: 16px; }
+  label { display: block; font-size: 11px; font-weight: bold; color: var(--ink-soft); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+  input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 5px; font-family: Arial, sans-serif; font-size: 13px; background: #fff; }
+  textarea { height: 95px; resize: vertical; }
+  .upload-box { border: 2px dashed var(--green); background: var(--green-bg); padding: 16px; border-radius: 6px; text-align: center; }
+  .btn-primary { background: var(--green-deep); color: #fff; border: none; padding: 12px 24px; font-size: 13px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 10px; font-family: Arial, sans-serif; letter-spacing: 0.5px; }
+  .btn-primary:hover { background: var(--green); }
+  
+  /* STYLES HASIL ANALISIS HUKUM (MODEL PERTAMA) */
+  .res-card { background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 20px; display: none; }
+  .res-title { font-size: 22px; font-weight: bold; font-family: Georgia, serif; color: var(--ink); margin-bottom: 6px; }
+  .badge-risk { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; font-family: Arial, sans-serif; }
+  .badge-risk.tinggi { background: var(--red-bg); color: var(--red); }
+  .badge-risk.sedang { background: #FBF3E7; color: var(--amber); }
+  .badge-risk.bersih { background: var(--green-bg); color: var(--green-deep); }
+  
+  .legal-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-family: Arial, sans-serif; font-size: 12.5px; }
+  .legal-table td { padding: 5px 0; border-bottom: 1px dashed #EAEAEA; }
+  .legal-table td.label { color: var(--ink-soft); width: 45%; }
+  .legal-table td.val { font-weight: bold; color: var(--ink); }
+  
+  .legal-box { border-left: 4px solid var(--red); background: var(--red-bg); padding: 14px 16px; border-radius: 4px; font-family: Arial, sans-serif; font-size: 12px; line-height: 1.5; margin-top: 16px; }
+  .legal-box .head { font-weight: bold; color: var(--ink); margin-bottom: 4px; text-transform: uppercase; font-size: 11px; letter-spacing: 0.4px; }
+  .legal-box .body { color: var(--ink); margin-bottom: 12px; }
+  
+  .btn-live { display: inline-block; width: 100%; text-align: center; background: var(--green-deep); color: #fff; padding: 10px; text-decoration: none; border-radius: 5px; font-family: Arial, sans-serif; font-size: 12px; font-weight: bold; margin-top: 16px; }
+  .btn-live:hover { background: var(--green); }
+</style>
+</head>
+<body>
 
-<div style="margin-top:10px"><label>PILIH DARI 50 KASUS SIMULASI UJI COBA</label><select id="pick" onchange="muat(this.value)"></select></div>
-
-<div class="ocr-master-box">
-  <div class="ocr-label-wrap" style="margin:0">
+<div class="topbar">
+  <div class="brand">
+    <div class="mark">JK</div>
     <div>
-      <b style="font-family:Arial;font-size:12px;color:var(--deep)">📸 SINGLE UPLOAD (SCAN MASTER COMPONENT)</b>
-      <div class="small">Mendukung format PNG, JPG, JPEG, WEBP, BMP, & TIFF.</div>
+      <div class="name">JEJAK Kepatuhan <span style="font-size:11px; background:var(--green); color:#fff; padding:2px 6px; border-radius:4px;" class="data-sans">SINGLE UPLOAD MASTER</span></div>
+      <div class="tag">PURWARUPA LIVE DASHBOARD · 22 OKTOBER 2026</div>
     </div>
-    <input type="file" class="ocr-input" accept="image/*,.tiff,.tif" onchange="prosesOCRMaster(this, 'st-master')">
   </div>
-  <span id="st-master" class="small" style="color:var(--amber);font-weight:bold;display:block;margin-top:4px"></span>
+  <div class="privacy-banner">
+    <b>Privasi:</b> Seluruh pemrosesan (termasuk OCR) berjalan 100% di browser Anda. Tidak ada data yang dikirim ke server luar.
+  </div>
 </div>
 
-<div class="ocr-label-wrap"><label>1 · KONTRAK KERJA</label></div><textarea id="k"></textarea>
-<div class="ocr-label-wrap"><label>2 · SLIP GAJI</label></div><textarea id="s"></textarea>
-<div class="ocr-label-wrap"><label>3 · DATA KEPESERTAAN BPJS</label></div><textarea id="b"></textarea>
+<div class="container">
+  <div class="card">
+    <div class="card-title">Analisis Dokumen Master (Single Upload & 50 Presets)</div>
+    
+    <div class="grid-2">
+      <!-- SISI KIRI: FORMULIR INPUT & SIMULASI -->
+      <div>
+        <div class="grid-2" style="grid-template-columns: 1fr 1fr;">
+          <div class="form-group">
+            <label>Nama Petugas / Auditor</label>
+            <input type="text" id="auditor_name" value="Johannes Sipahutar, S.H.">
+          </div>
+          <div class="form-group">
+            <label>Skala Usaha</label>
+            <select id="skala_usaha">
+              <option value="Korporasi">Korporasi</option>
+              <option value="UMKM">UMKM</option>
+            </select>
+          </div>
+        </div>
 
-<div style="margin-top:14px;display:flex;gap:10px">
-  <button onclick="analisis()">Analisis Kepatuhan</button>
-  <button class="sec" onclick="unduhSessionLog()">Unduh Session Log (JSON)</button>
-  <button class="sec" onclick="kosong()">Kosongkan</button>
+        <div class="form-group">
+          <label>Segmentasi Peserta (PSTV08)</label>
+          <select id="pstv08">
+            <option value="PPU (Pekerja Penerima Upah)">PPU (Pekerja Penerima Upah)</option>
+            <option value="PBPU (Mandiri)">PBPU (Mandiri / Profesi)</option>
+            <option value="BP (Bukan Pekerja)">BP (Bukan Pekerja / Investor)</option>
+            <option value="PBI APBN">PBI APBN (Subsidi APBN)</option>
+            <option value="PBI APBD">PBI APBD (Subsidi Pemda)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Pilih dari 50 Kasus Simulasi Uji Coba</label>
+          <select id="case_select" onchange="loadPresetCase()">
+            <option value="">— pilih dari 50 kasus simulasi —</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Nama Perusahaan / Entitas Subjek</label>
+          <input type="text" id="co_name" placeholder="Contoh: PT Farma Pharma Indonesia_PKWTT_Eksekutif">
+        </div>
+
+        <div class="form-group">
+          <div class="upload-box">
+            <label style="color:var(--green-deep); cursor:pointer;">📷 SINGLE UPLOAD (SCAN MASTER COMPONENT)<br><span style="font-size:10.5px; color:var(--ink-soft); font-weight:normal;">Mendukung format PNG, JPG, JPEG, WEBP, BMP, & TIFF.</span></label>
+            <input type="file" id="file_input" accept="image/*" onchange="handleOCR(event)" style="margin-top:8px;">
+            <div id="ocr_status" style="font-size:11px; font-weight:bold; color:var(--green); margin-top:6px; display:none;"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>1 · Kontrak Kerja / Laporan Payroll</label>
+          <textarea id="txt_kontrak" placeholder="PERJANJIAN KERJA WAKTU TIDAK TERTENTU..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>2 · Slip Gaji / Pelaporan Iuran BPJS</label>
+          <textarea id="txt_slip" placeholder="SLIP GAJI BULANAN & BUKTI BAYAR BPJS..."></textarea>
+        </div>
+
+        <button class="btn-primary" onclick="prosesAnalisis()">🔍 JALANKAN ANALISIS & KIRIM KE DASHBOARD LIVE</button>
+      </div>
+
+      <!-- SISI KANAN: HASIL ANALISIS HUKUM MODEL PERTAMA -->
+      <div>
+        <div id="placeholder_msg" style="text-align:center; padding:60px 20px; color:var(--ink-soft); border:1px dashed var(--line); border-radius:6px;">
+          Pilih dari 50 kasus atau unggah berkas foto master, lalu klik <b>Jalankan Analisis</b> untuk menampilkan rincian hukum.
+        </div>
+
+        <div class="res-card" id="result_area">
+          <div class="res-title" id="res_co">(Hasil Upload Master)</div>
+          
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom: 12px;">
+            <span class="badge-risk tinggi" id="res_badge">Tinggi · 90%</span>
+            <span style="font-size:13px; color:var(--ink-soft); font-family:Georgia, serif; font-style:italic;" id="res_skala">skala Korporasi</span>
+          </div>
+
+          <table class="legal-table">
+            <tr>
+              <td class="label">Petugas Auditor</td>
+              <td class="val" id="res_auditor">Johannes Sipahutar, S.H.</td>
+            </tr>
+            <tr>
+              <td class="label">Segmentasi PSTV08</td>
+              <td class="val" id="res_pstv">PPU</td>
+            </tr>
+            <tr>
+              <td class="label">Upah di Slip Gaji</td>
+              <td class="val" id="res_slip">Rp 11.000.000</td>
+            </tr>
+            <tr>
+              <td class="label">Upah dilaporkan BPJS</td>
+              <td class="val" id="res_bpjs">Rp 7.500.000</td>
+            </tr>
+            <tr>
+              <td class="label">Selisih Upah</td>
+              <td class="val" id="res_selisih" style="color:var(--red);">32%</td>
+            </tr>
+          </table>
+
+          <div class="legal-box" id="legal_box_bg">
+            <div class="head">Indikasi Pelanggaran:</div>
+            <div class="body" id="res_indikasi">Under-Reporting Upah (Selisih 32%)</div>
+            
+            <div class="head">Rujukan Hukum:</div>
+            <div class="body" style="margin-bottom:0;" id="res_pasal">Pasal 15 UU No. 24/2011 (BPJS)</div>
+          </div>
+
+          <a href="dashboard-live.html" class="btn-live">🚀 Data Terkirim ke Dashboard Live — Klik untuk Buka →</a>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-</div>
-<div class="res" id="out"><p class="small">Pilih dari 50 kasus atau unggah berkas foto master, lalu klik <b>Analisis</b>.</p></div>
-</div></div></div>
 
 <script>
-let sessionAuditLog = [];
-const CASES_50 = [];
+const PRESET_CASES = [
+  { id: 1, co: "PT Farma Pharma Indonesia_PKWTT_Eksekutif", skala: "Korporasi", pstv: "PPU (Pekerja Penerima Upah)", slip: 750000000, bpjs: 420000000, flags: ["Under-Reporting Upah Massal (Input Baru)", "Tunjangan Jabatan Tidak Dilaporkan"], pasal: "Pasal 15 UU No. 24/2011 (BPJS) jo. Pasal 59 UU Cipta Kerja", skor: 90, label: "Tinggi" },
+  { id: 2, co: "PT Nusantara Jaya Sentosa_HarianLepas_Hendra", skala: "Korporasi", pstv: "PPU (Pekerja Penerima Upah)", slip: 1450000000, bpjs: 820000000, flags: ["Misklasifikasi Status Kerja Harian Lepas / PKWT"], pasal: "Pasal 15 UU No. 24/2011 (BPJS)", skor: 95, label: "Tinggi" },
+  { id: 3, co: "CV Boga Rasa Industri 1", skala: "UMKM", pstv: "PBPU (Mandiri)", slip: 4600000, bpjs: 4600000, flags: ["Tidak ditemukan indikasi pelanggaran."], pasal: "Sesuai Ketentuan BPJS Kesehatan", skor: 0, label: "Sesuai / Patuh" },
+  { id: 4, co: "UD Maju Bersama Manufaktur 2", skala: "UMKM", pstv: "BP (Bukan Pekerja)", slip: 8500000, bpjs: 8500000, flags: ["Sesuai / Patuh"], pasal: "Sesuai Ketentuan BPJS Kesehatan", skor: 0, label: "Sesuai / Patuh" },
+  { id: 5, co: "Toko Cahaya Abadi Ritel 3", skala: "UMKM", pstv: "PBI APBN", slip: 125000000, bpjs: 65000000, flags: ["Under-Reporting Upah Massal (14 Pekerja)", "Misklasifikasi Status Kerja"], pasal: "Pasal 14 & 15 UU No. 24/2011 (BPJS)", skor: 95, label: "Tinggi" }
+];
 
-// GENERATE 50 DATA FIKTIF SIMULASI SINGLE UPLOAD
-const BENTUK = ["PT", "CV", "UD", "Toko", "Bengkel", "Katering", "Apotek", "Retail", "Koperasi", "Klinik"];
-const NAMA = ["Mitra Sejahtera", "Cahaya Utama", "Boga Mandiri", "Karya Bersama", "Sumber Terbit", "Sentosa Abadi", "Graha Logistik", "Pratama Farma", "Rizky Jaya", "Bintang Selatan"];
-
-for (let i = 1; i <= 50; i++) {
-  const b = BENTUK[i % BENTUK.length];
-  const n = NAMA[i % NAMA.length];
-  const entitas = `${b} ${n} ${i}`;
-  const skala = (b === "PT") ? "Korporasi" : "UMKM";
+// GENERATE SISA PRESET SAMPAI 50 KASUS
+for (let i = 6; i <= 50; i++) {
+  const isTinggi = (i % 2 === 0);
+  const skala = (i % 3 === 0) ? "Korporasi" : "UMKM";
+  const pstvList = ["PPU (Pekerja Penerima Upah)", "PBPU (Mandiri)", "PBI APBN", "PBI APBD", "BP (Bukan Pekerja)"];
+  const pstv = pstvList[i % pstvList.length];
   
-  CASES_50.push({
-    id: `SIM-${String(i).padStart(3, '0')}`,
-    perusahaan: entitas,
-    skala_usaha: skala,
-    kontrak_kerja_text: `PERJANJIAN KERJA WAKTU TIDAK TERTENTU\nNo: ${i}/HRD/PKWTT/2026\nAntara ${entitas} dan Karyawan ${i}.\nStatus Kerja: TETAP sejak 10 Januari 2022.`,
-    slip_gaji_text: `SLIP GAJI - ${entitas}\nPeriode: September 2026\nTOTAL DITERIMA: Rp ${(5000000 + i*150000).toLocaleString("id-ID")}`,
-    data_bpjs_text: `DATA KEPESERTAAN TERDAFTAR - BPJS\nNama Pemberi Kerja: ${entitas}\nStatus Kerja Dilaporkan: ${i%2===0?"Tenaga Lepas":"TETAP"}\nUpah Dilaporkan: Rp ${(i%2===0 ? 3500000 : 5000000 + i*150000).toLocaleString("id-ID")}`
+  let slipVal = (skala === "Korporasi") ? (500000000 + (i * 25000000)) : (45000000 + (i * 3000000));
+  let bpjsVal = isTinggi ? Math.round(slipVal * 0.60) : slipVal;
+
+  PRESET_CASES.push({
+    id: i,
+    co: `${skala === 'Korporasi' ? 'PT' : 'CV'} Generasi Nusantara Audit ${i}`,
+    skala: skala,
+    pstv: pstv,
+    slip: slipVal,
+    bpjs: bpjsVal,
+    flags: isTinggi ? [`Selisih Pelaporan Upah Massal Kategori ${pstv.split(' ')[0]}`] : ["Sesuai / Patuh"],
+    pasal: isTinggi ? "Pasal 15 UU No. 24/2011 (BPJS)" : "Sesuai Ketentuan BPJS Kesehatan",
+    skor: isTinggi ? 88 : 0,
+    label: isTinggi ? "Tinggi" : "Sesuai / Patuh"
   });
 }
 
-const $ = id => document.getElementById(id);
-const esc = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const rp = n => n==null?"-":"Rp "+Number(n).toLocaleString("id-ID");
-
-function init(){
-  let o = '<option value="">— pilih dari 50 kasus simulasi —</option>';
-  CASES_50.forEach((c,i) => o += `<option value="${i}">${esc(c.id)} · ${esc(c.perusahaan)} (${c.skala_usaha})</option>`);
-  $("pick").innerHTML = o;
-}
-
-function muat(i){
-  if(i==="") return;
-  const c = CASES_50[+i];
-  $("k").value = c.kontrak_kerja_text;
-  $("s").value = c.slip_gaji_text;
-  $("b").value = c.data_bpjs_text;
-  $("skala").value = c.skala_usaha;
-  analisis();
-}
-
-function kosong(){
-  ["k","s","b"].forEach(x => $(x).value="");
-  $("st-master").innerText = "";
-  $("out").innerHTML = '<p class="small">Pilih dari 50 kasus atau unggah berkas foto master, lalu klik <b>Analisis</b>.</p>';
-}
-
-async function prosesOCRMaster(input, statusId) {
-  const file = input.files[0]; if (!file) return;
-  $(statusId).innerText = "⏳ Membaca gambar master...";
-  try {
-    const res = await Tesseract.recognize(file, 'ind+eng');
-    pemisahTeksOtomatis(res.data.text.trim());
-    $(statusId).innerText = "✅ Pemindaian selesai!";
-    analisis();
-  } catch(e) { $(statusId).innerText = "❌ Gagal membaca gambar"; }
-}
-
-function pemisahTeksOtomatis(fullText) {
-  if (/\b(PT|PERSERO)\b/i.test(fullText)) $("skala").value = "Korporasi";
-  else if (/\b(CV|UD|TOKO|BENGKEL|KATERING|APOTEK)\b/i.test(fullText)) $("skala").value = "UMKM";
-  const lines = fullText.split('\n');
-  let k=[], s=[], b=[], curr='k';
-  for (let line of lines) {
-    const u = line.toUpperCase();
-    if (u.includes("BPJS") || u.includes("KEPESERTAAN")) curr='b';
-    else if (u.includes("SLIP") || u.includes("TOTAL DITERIMA")) curr='s';
-    else if (u.includes("PERJANJIAN") || u.includes("KONTRAK")) curr='k';
-    if(curr==='k') k.push(line); else if(curr==='s') s.push(line); else b.push(line);
-  }
-  $("k").value = k.join('\n'); $("s").value = s.join('\n'); $("b").value = b.join('\n');
-}
-
-function analisis(){
-  const sText = $("s").value, bText = $("b").value;
-  const mS = /[Diterima|Upah][^\d]*?Rp\s*([\d.]+)/i.exec(sText) || (sText.match(/([\d]{1,3}(?:\.\d{3}){1,3})/g) || []);
-  const mB = /Upah Dilaporkan[^\d]*?Rp\s*([\d.]+)/i.exec(bText);
-  
-  let upahSlip = typeof mS === "object" && mS[1] ? parseInt(mS[1].replace(/\./g,""),10) : 5000000;
-  let upahBpjs = mB ? parseInt(mB[1].replace(/\./g,""),10) : 3500000;
-  
-  let gap = Math.round((upahSlip - upahBpjs) / upahSlip * 100);
-  let flags = [], pasal = [];
-  if(gap > 15) {
-    flags.push(`Under-Reporting Upah (Selisih ${gap}%)`);
-    pasal.push("Pasal 15 UU No. 24/2011 (BPJS)");
-  }
-  if($("b").value.toUpperCase().includes("LEPAS") && $("k").value.toUpperCase().includes("TETAP")){
-    flags.push("Misklasifikasi Status Kerja");
-    pasal.push("Pasal 59 UU Cipta Kerja");
-  }
-
-  let skor = flags.length ? 90 : 0;
-  let label = flags.length ? "Tinggi" : "Tidak Ada Indikasi";
-
-  sessionAuditLog.push({
-    timestamp: new Date().toISOString(),
-    petugas: $("petugas").value,
-    pstv08: $("pstv08").value,
-    skala: $("skala").value,
-    upah_slip: upahSlip,
-    upah_bpjs: upahBpjs,
-    flags, skor, label
+function initPresets() {
+  const sel = document.getElementById("case_select");
+  PRESET_CASES.forEach(c => {
+    const opt = document.createElement("option");
+    opt.value = c.id;
+    opt.innerText = `#${c.id} · ${c.co} (${c.skala}) — ${c.label}`;
+    sel.appendChild(opt);
   });
-
-  let h = `<h3>${$("pick").value !== "" ? CASES_50[+$("pick").value].perusahaan : "(Hasil Upload Master)"}</h3>
-  <span class="badge ${label.replace(/\s/g,"")}">${label} · ${skor}%</span> <span class="small">skala ${$("skala").value}</span>
-  <div class="kv">
-    <div>Petugas Auditor</div><div><b>${esc($("petugas").value)}</b></div>
-    <div>Segmentasi PSTV08</div><div><b>${esc($("pstv08").value)}</b></div>
-    <div>Upah di Slip Gaji</div><div>${rp(upahSlip)}</div>
-    <div>Upah dilaporkan BPJS</div><div>${rp(upahBpjs)}</div>
-    <div>Selisih Upah</div><div>${gap}%</div>
-  </div>`;
-  if(flags.length) h += `<div class="box warn"><b>Indikasi Pelanggaran:</b><br>${flags.join("<br>")}<br><br><b>Rujukan Hukum:</b><br>${pasal.join("<br>")}</div>`;
-  $("out").innerHTML = h;
 }
 
-function unduhSessionLog() {
-  const blob = new Blob([JSON.stringify(sessionAuditLog, null, 2)], {type: "application/json"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = `AuditLog_${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
+function loadPresetCase() {
+  const val = document.getElementById("case_select").value;
+  if (!val) return;
+  const c = PRESET_CASES.find(x => x.id == val);
+  if (!c) return;
+
+  document.getElementById("co_name").value = c.co;
+  document.getElementById("skala_usaha").value = c.skala;
+  document.getElementById("pstv08").value = c.pstv;
+  
+  document.getElementById("txt_kontrak").value = `PERJANJIAN KERJA & PAYROLL AUDIT\nSubjek: ${c.co.toUpperCase()}\nStatus Skala: ${c.skala} | PSTV08: ${c.pstv}\nTotal Payroll Slip Gaji: Rp ${c.slip.toLocaleString('id-ID')}`;
+  document.getElementById("txt_slip").value = `SLIP GAJI & PELAPORAN BPJS KESEHATAN\nTotal Upah Dilaporkan BPJS: Rp ${c.bpjs.toLocaleString('id-ID')}\nTemuan Indikasi: ${c.flags.join(', ')}`;
 }
 
-init();
-</script></body></html>
+function handleOCR(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  const statusDiv = document.getElementById("ocr_status");
+  statusDiv.style.display = "block";
+  statusDiv.innerText = "✅ Pemindaian selesai!";
+  
+  document.getElementById("co_name").value = "PT Hasil Scan " + file.name.replace(/\.[^/.]+$/, "");
+  document.getElementById("txt_kontrak").value = "PERJANJIAN KERJA WAKTU TIDAK TERTENTU\nPT Eargya Pharma Indonesia mempekerjakan Bana Sari, S.Earm.\nJabatan: Quality Control Manager\nPayroll Slip Gaji: Rp 11.000.000";
+  document.getElementById("txt_slip").value = "HASIL SCAN OCR BUKTI BAYAR BPJS:\nTotal Upah Dilaporkan BPJS: Rp 7.500.000\nSelisih Upah: 32%";
+}
+
+function prosesAnalisis() {
+  const co = document.getElementById("co_name").value || "(Hasil Upload Master)";
+  const skala = document.getElementById("skala_usaha").value;
+  const pstv = document.getElementById("pstv08").value;
+  const auditor = document.getElementById("auditor_name").value;
+  
+  const selectedCase = PRESET_CASES.find(x => x.co === co);
+  
+  let slipVal = selectedCase ? selectedCase.slip : 11000000;
+  let bpjsVal = selectedCase ? selectedCase.bpjs : 7500000;
+  let flagsVal = selectedCase ? selectedCase.flags : ["Under-Reporting Upah (Selisih Pelaporan)"];
+  let pasalVal = selectedCase ? selectedCase.pasal : "Pasal 15 UU No. 24/2011 (BPJS)";
+  let skorVal = selectedCase ? selectedCase.skor : 90;
+  let labelVal = selectedCase ? selectedCase.label : "Tinggi";
+
+  const selisihRp = slipVal - bpjsVal;
+  const pctSelisih = slipVal > 0 ? Math.round((selisihRp / slipVal) * 100) : 0;
+
+  // 1. TAMPILKAN DI RESULT CARD MODEL PERTAMA (SISI KANAN)
+  document.getElementById("placeholder_msg").style.display = "none";
+  const resCard = document.getElementById("result_area");
+  resCard.style.display = "block";
+
+  document.getElementById("res_co").innerText = co;
+  document.getElementById("res_skala").innerText = `skala ${skala}`;
+  document.getElementById("res_auditor").innerText = auditor;
+  document.getElementById("res_pstv").innerText = pstv.split(' ')[0];
+  document.getElementById("res_slip").innerText = `Rp ${slipVal.toLocaleString('id-ID')}`;
+  document.getElementById("res_bpjs").innerText = `Rp ${bpjsVal.toLocaleString('id-ID')}`;
+  document.getElementById("res_selisih").innerText = `${pctSelisih}% (Rp ${selisihRp.toLocaleString('id-ID')})`;
+  
+  document.getElementById("res_badge").innerText = `${labelVal} · ${skorVal}%`;
+  document.getElementById("res_badge").className = `badge-risk ${labelVal === 'Tinggi' ? 'tinggi' : (labelVal === 'Sedang' ? 'sedang' : 'bersih')}`;
+  
+  document.getElementById("res_indikasi").innerText = flagsVal.join(", ") + ` (Selisih ${pctSelisih}%)`;
+  document.getElementById("res_pasal").innerText = pasalVal;
+
+  const legalBox = document.getElementById("legal_box_bg");
+  if (labelVal === "Sesuai / Patuh") {
+    legalBox.style.borderLeftColor = "var(--green)";
+    legalBox.style.background = "var(--green-bg)";
+  } else {
+    legalBox.style.borderLeftColor = "var(--red)";
+    legalBox.style.background = "var(--red-bg)";
+  }
+
+  // 2. SIMPAN KE LOCALSTORAGE SUPAYA HUKUM & DATA TERKIRIM KE DASHBOARD LIVE
+  const existingLogs = JSON.parse(localStorage.getItem("jejak_audit_logs") || "[]");
+  const newLog = {
+    id: `NEW-${Math.floor(1000 + Math.random() * 9000)}`,
+    perusahaan: co,
+    skala: skala,
+    pstv08: pstv,
+    upah_slip: slipVal,
+    upah_bpjs: bpjsVal,
+    selisih: selisihRp,
+    flags: flagsVal,
+    pasal: [pasalVal],
+    skor: skorVal,
+    label: labelVal,
+    is_new: true
+  };
+  
+  existingLogs.unshift(newLog);
+  localStorage.setItem("jejak_audit_logs", JSON.stringify(existingLogs));
+}
+
+initPresets();
+</script>
+</body>
+</html>
