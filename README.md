@@ -1,55 +1,3 @@
-**DOKUMEN 1: README_JO.md (Catatan Internal & Catatan Pribadi)**
-
-```markdown
-# 📓 CATATAN PRIBADI & JURNAL PROYEK — JEJAK KEPATUHAN
-**Inisiasi Proyek:** 7 Oktober 2026  
-**Pengembang Utama:** Johannes HP Sipahutar, S.H., CLA  
-**Kategori:** Healthkathon BPJS Kesehatan 2026 — *Non-Programmer (Employer Risk Efficiency)*
-
----
-
-## 📜 Rekam Jejak Perkembangan (Chronological Milestone Log)
-
-### 🔴 Fase 1: Konseptualisasi & Fondasi Hukum (7 Oktober 2026)
-* **Inisiasi Ide:** Perancangan konsep awal "JEJAK Kepatuhan" sebagai instrumen audit otomatis untuk memetakan dua modus utama pelanggaran pemberi kerja: *under-reporting upah* dan *misklasifikasi status hubungan kerja*.
-* **Penyusunan Dasar Hukum:** Mengunci parameter pemeriksaan berbasis aturan perundang-undangan eksplisit:
-  * Pasal 15 UU No. 24/2011 (Kewajiban pendaftaran dan pelaporan data upah yang benar).
-  * Pasal 59 UU No. 6/2023 jo. PP No. 35/2021 (Ketentuan PKWT/Harian Lepas yang batal demi hukum menjadi PKWTT).
-
-### 🟡 Fase 2: Mesin Deteksi & Dataset Awal (21 Oktober 2026)
-* **Pembangunan Python Engine:** Pembuatan skrip `engine.py` dan `logger_jejak.py` untuk pemrosesan teks, komparasi data slip gaji vs data laporan BPJS Kesehatan, serta eksekusi *rule-based matching*.
-* **Dataset Simulasi:** Penyusunan 12 hingga 50 data fiktif sampel entitas pemberi kerja lintas sektor (PPU, PBPU, BP, PBI APBN, dan PBI APBD).
-* **Rancangan Purwarupa:** Pembuatan antarmuka web awal untuk memvisualisasikan temuan audit kepatuhan.
-
-### 🟢 Fase 3: Integrasi Standalone Client-Side & GitHub Pages (22 Oktober 2026)
-* **Client-Side HTML Full Integration:** Memindahkan seluruh mesin pemrosesan dan OCR Tesseract.js agar berjalan 100% *client-side* tanpa server luar di berkas `demo_jejak.html` dan `dashboard-live.html`.
-* **Koneksi Dynamic Interoperability:** Mengirimkan hasil *Single Upload / Scan OCR* dari `demo_jejak.html` langsung ke `dashboard-live.html` menggunakan browser `localStorage`, dilengkapi penanda khusus bertuliskan **`[INPUTAN BARU]`**.
-* **Eskalasi Finansial & Nilai Bisnis Strategis:** Skalasi nilai selisih upah sampel ke tingkat Miliar Rupiah dan ekstrapolasi proyeksi pemulihan iuran nasional hingga **Rp 1,85 Triliun**.
-* **Keamanan Veto Master:** Penerapan skema otorisasi bertingkat (*Auditor* vs *Veto Master*) yang dilindungi enkripsi kriptografi SHA-256 (`d2d5382d34c986025cc325400def54b30257df34fc45e1fcd2731f8fea5eb73d`) serta kunci *anti-brute-force*.
-* **Peluncuran GitHub Pages:** Publikasi repositori resmi di `https://github.com/Parulian-290/jejak-kepatuhan-prototype`.
-
----
-
-## 💻 Panduan Perintah Git Terminal / Command Prompt Lokal
-
-```cmd
-:: 1. Masuk ke folder lokal proyek
-cd "%USERPROFILE%\Documents\00aHealthkathon 2026\PANDUAN NEXT LEVEL UP\Menggunakan GEMINI sipahutar819gmail"
-
-:: 2. Cek status berkas
-git status
-
-:: 3. Tambahkan perubahan & buat komit
-git add .
-git commit -m "Update integrasi 50 kasus PSTV08, penanda INPUTAN BARU, dan analisis hukum"
-
-:: 4. Kirim ke repositori GitHub Pages
-git push origin main
-
-```
-
----
-
 ## 🎯 Rencana Tindak Lanjut (RTL) Pasca-Healthkathon
 
 1. **Auto Notice Teguran:** Penerbitan draft Surat Pemberitahuan Kepatuhan otomatis saat indikasi *under-reporting* > 20%.
@@ -60,7 +8,7 @@ git push origin main
 
 ---
 
-**DOKUMEN 2: README.md (Versi Resmi untuk Repositori GitHub)**
+README.md (Versi Resmi untuk Repositori GitHub)**
 
 ```markdown
 # 🛡️ JEJAK Kepatuhan — Employer Risk Efficiency Engine
