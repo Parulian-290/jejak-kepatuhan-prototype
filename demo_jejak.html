@@ -49,10 +49,18 @@
   .legal-box .head { font-weight: bold; color: var(--ink); margin-bottom: 4px; text-transform: uppercase; font-size: 11px; letter-spacing: 0.4px; }
   .legal-box .body { color: var(--ink); margin-bottom: 12px; }
   
-  .btn-live { display: inline-block; width: 100%; text-align: center; background: var(--green-deep); color: #fff; padding: 10px; text-decoration: none; border-radius: 5px; font-family: Arial, sans-serif; font-size: 12px; font-weight: bold; margin-top: 16px; }
-  .btn-live:hover { background: var(--green); }
+.btn-live { display: inline-block; width: 100%; text-align: center; background: var(--green-deep); color: #fff; padding: 10px; text-decoration: none; border-radius: 5px; font-family: Arial, sans-serif; font-size: 12px; font-weight: bold; margin-top: 16px; }
+.btn-live:hover { background: var(--green); }
+
+/* KODE RESPONSIF KHUSUS HP */
+@media (max-width: 768px) {
+  body { padding: 10px !important; margin: 0 !important; }
+  .container, .card { width: 100% !important; padding: 12px !important; }
+  .grid-2 { display: flex !important; flex-direction: column !important; gap: 15px !important; }
+  input, select, textarea, button { width: 100% !important; font-size: 16px !important; }
+}
 </style>
-</head>
+  </head>
 <body>
 
 <div class="topbar">
