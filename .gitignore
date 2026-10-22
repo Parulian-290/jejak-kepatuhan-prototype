@@ -1,6 +1,10 @@
-   __pycache__/
-   *.pyc
-   .DS_Store
-   Thumbs.db
-   .env
-   *.key
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+.env
+*.key
+# Abaikan berkas catatan rahasia dan log lokal
+KUNCI_AKSES.txt
+*.env
+*.log
